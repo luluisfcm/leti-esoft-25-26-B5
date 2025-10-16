@@ -4,13 +4,12 @@
 
 The team consists of the students listed in the table below. 
 
-| Student Number	 | Name |
-|-----------------|----------------------------|
-| **1XXXXXX**     | Name of student 1          |
-| **1XXXXXX**     | Name of student 2          |
-| **1XXXXXX**     | Name of student 3          |
-| **1XXXXXX**     | Name of student 4          |
-
+| Student Number	 | Name             |
+|-----------------|------------------|
+| **1221432**     | Luís Martins     |
+| **1222100**     | Francisco Falcão |
+| **1230593**     | Raul Choupina    |
+| **1231479**     | José Figueiras   |
 
 # 2. Task Distribution ###
 
