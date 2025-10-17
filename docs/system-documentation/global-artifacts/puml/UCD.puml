@@ -1,0 +1,66 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+title PVMS – Pandemic Vaccination Management System (Use Case Diagram)
+
+' Atores
+:SNS User: as SNS
+:Receptionist: as REC
+:Nurse: as NUR
+:DGS Administrator: as ADM
+(Time/Notification Service) as NOTIF
+
+' Use Cases principais
+(UC01 - Register SNS User) as UC01
+(UC02 - Schedule Vaccination Appointment) as UC02
+(UC03 - Get Vaccination Certificate) as UC03
+(UC04 - Register Arrival / Check-in) as UC04
+(UC05 - Manage Waiting Queue) as UC05
+(UC06 - Administer Vaccine) as UC06
+(UC07 - Record Vaccination Event) as UC07
+(UC08 - Record Adverse Reaction) as UC08
+(UC09 - Issue Certificate On-site) as UC09
+
+' Administração / Configuração
+(UC10 - Manage Vaccination Centers) as UC10
+(UC11 - Manage Personnel) as UC11
+(UC12 - Manage Vaccine Types & Brands) as UC12
+(UC13 - Set Current Outbreak & Default Vaccine Type) as UC13
+
+' Serviços auxiliares
+(UC14 - Notify Appointment Confirmation) as UC14
+(UC15 - Capacity Check) as UC15
+
+' Ligações ator → UC
+SNS --> UC02
+SNS --> UC03
+REC --> UC04
+REC --> UC02
+NUR --> UC06
+NUR --> UC07
+NUR --> UC08
+NUR --> UC09
+ADM --> UC10
+ADM --> UC11
+ADM --> UC12
+ADM --> UC13
+
+' Relações entre UCs
+UC02 --> UC15
+UC02 --> UC14
+UC14 ..> NOTIF : «external»
+UC04 --> UC05
+UC06 --> UC07
+UC06 ..> UC08 : «if reaction»
+
+' Notas de contexto (exemplos)
+note right of UC15
+Check center timeslot capacity
+(max vaccines/hour)
+end note
+
+note right of NUR
+Only nurses access full health data
+end note
+
+@enduml
