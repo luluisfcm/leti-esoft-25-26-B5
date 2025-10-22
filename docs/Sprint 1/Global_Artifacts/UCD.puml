@@ -15,7 +15,7 @@ title PVMS – Pandemic Vaccination Management System (Use Case Diagram)
 (UC02 - Schedule Vaccination Appointment) as UC02
 (UC03 - Get Vaccination Certificate) as UC03
 (UC04 - Register Arrival / Check-in) as UC04
-(UC05 - Manage Waiting Queue) as UC05
+(UC05 - View Waiting Queue) as UC05
 (UC06 - Administer Vaccine) as UC06
 (UC07 - Record Vaccination Event) as UC07
 (UC08 - Record Adverse Reaction) as UC08
@@ -34,8 +34,10 @@ title PVMS – Pandemic Vaccination Management System (Use Case Diagram)
 ' Ligações ator → UC
 SNS --> UC02
 SNS --> UC03
+REC --> UC01
 REC --> UC04
 REC --> UC02
+NUR --> UC05
 NUR --> UC06
 NUR --> UC07
 NUR --> UC08
@@ -49,7 +51,6 @@ ADM --> UC13
 UC02 --> UC15
 UC02 --> UC14
 UC14 ..> NOTIF : «external»
-UC04 --> UC05
 UC06 --> UC07
 UC06 ..> UC08 : «if reaction»
 
@@ -61,6 +62,12 @@ end note
 
 note right of NUR
 Only nurses access full health data
+end note
+
+note left of UC01
+Assumed role, as receptionists
+already provide in-person support
+for scheduling.
 end note
 
 @enduml
