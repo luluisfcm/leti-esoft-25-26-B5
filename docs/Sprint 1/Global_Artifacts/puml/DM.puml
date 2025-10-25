@@ -1,0 +1,145 @@
+@startuml
+title PVMS – Domain Model (Aligned and Corrected)
+
+hide methods
+skinparam classAttributeIconSize 0
+
+' ===================== SNS Users =====================
+class SNSUser {
+  + snsNumber : String <<PK>>
+  --
+  + name : String
+  + dateOfBirth : Date
+  + sex : String
+  + postalAddress : String
+  + phone : String
+  + email : String
+  + citizenCardNumber : String
+}
+
+' ===================== Staff =====================
+abstract StaffMember {
+  + id : Integer <<PK>>
+  --
+  + name : String
+  + postalAddress : String
+  + phone : String
+  + email : String
+}
+
+class Receptionist extends StaffMember
+class Nurse extends StaffMember {
+  + <<Note>> : Authorized to access full health data
+}
+class DGSAdministrator extends StaffMember
+
+' ===================== Centers =====================
+enum CenterType {
+  HealthcareCenter
+  CommunityMass
+}
+
+class VaccinationCenter {
+  + id : Integer <<PK>>
+  --
+  + name : String
+  + postalAddress : String
+  + phone : String
+  + email : String
+  + website : String
+  + maxVaccinesPerHour : Integer
+  + openingHours : Time
+  + closingHours : Time
+  + type : CenterType
+}
+
+' Which vaccine types a center can administer
+VaccinationCenter "1" -- "0..*" VaccineType : supports
+
+' ===================== Vaccines =====================
+class VaccineType {
+  + code : String <<PK>>
+  --
+  + disease : String
+  + shortDescription : String
+}
+
+class Vaccine {
+  + id : Integer <<PK>>
+  --
+  + commercialName : String
+  + brand : String
+  + technologyUsed : String
+}
+
+VaccineType "1" -- "1..*" Vaccine : has brands of
+
+' ===================== Appointments & Events =====================
+enum AppointmentStatus {
+  Scheduled
+  Arrived
+  Ready
+  InProgress
+  Vaccinated
+  Cancelled
+  NoShow
+}
+
+class Appointment {
+  + id : Integer <<PK>>
+  --
+  + date : Date
+  + time : Time
+  + status : AppointmentStatus
+  + arrivalDateTime : DateTime
+}
+
+class VaccinationEvent {
+  + id : Integer <<PK>>
+  --
+  + lotNumber : String
+  + administrationDateTime : DateTime
+}
+
+class AdverseReaction {
+  + id : Integer <<PK>>
+  --
+  + description : String
+  + severity : String
+  + observedAt : DateTime
+  + notes : String
+}
+
+class VaccinationCertificate {
+  + id : Integer <<PK>>
+  --
+  + issueDate : Date
+}
+
+' ===================== Outbreak / Defaults =====================
+class Outbreak {
+  + id : Integer <<PK>>
+  --
+  + name : String
+  + startDate : Date
+  + current : Boolean
+}
+
+' ===================== Associations =====================
+SNSUser "1" -- "0..*" Appointment : schedules
+Appointment "0..*" -- "1" VaccinationCenter : at
+Appointment "0..*" -- "1" VaccineType : is for
+
+Appointment "1" -- "0..1" VaccinationEvent : results in
+VaccinationEvent "0..*" -- "1" Vaccine : records brand/lot of
+VaccinationEvent "1" -- "0..*" AdverseReaction : captures
+
+SNSUser "1" -- "0..*" VaccinationCertificate : obtains
+VaccinationEvent "1" -- "1" VaccinationCertificate : documents
+Nurse "1" -- "0..*" VaccinationEvent : administers
+Nurse "1" -- "0..*" VaccinationCertificate : issues on-site
+
+StaffMember "0..*" -- "0..*" VaccinationCenter : works at
+
+Outbreak "0..1" -- "1" VaccineType : defaultFor
+@enduml
