@@ -53,9 +53,10 @@ UC02 --> UC14
 UC14 ..> NOTIF : «external»
 UC06 --> UC07
 UC06 ..> UC08 : «if reaction»
+UC10 --> UC12 : «include»
 
 ' Notas de contexto (exemplos)
-note right of UC15
+note bottom of UC15
 Check center timeslot capacity
 (max vaccines/hour)
 end note
@@ -64,10 +65,18 @@ note right of NUR
 Only nurses access full health data
 end note
 
-note left of UC01
+note bottom of UC01
 Assumed role, as receptionists
 already provide in-person support
 for scheduling.
+end note
+
+note bottom of UC10
+Manage center data:
+- Create/update center info
+- Configure supported vaccine types
+- Set capacity, hours, contacts
+- Restrict CommunityMass to one vaccine type
 end note
 
 @enduml
