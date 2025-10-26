@@ -1,16 +1,23 @@
-### Glossário
-
-Termos, Expressões e Acrónimos (TEA) organizados alfabeticamente.
 
 | TEA (EN) | TEA (PT) | Description (EN) |
 | :--- | :--- | :--- |
-| **API** | API | Acronym for *Application Programming Interface*. [cite_start]The server-side application exposes multiple APIs to support user applications[cite: 97, 100]. |
-| **Community mass vaccination center** | Centro de vacinação em massa comunitário | [cite_start]Temporary facilities created specifically to administer a single type of vaccine in response to an ongoing disease outbreak[cite: 33]. |
-| **DGS** | DGS | [cite_start]Acronym for the state-funded Portuguese healthcare system [cite: 7, 17, 28] [cite_start]responsible for the National Vaccination Program[cite: 28]. |
-| **DGS Administrator** | Administrador(a) da DGS | [cite_start]Personnel responsible for managing the application [cite: 62][cite_start], including the registration of vaccination centers and personnel [cite: 62] [cite_start]and configuring core data such as vaccines[cite: 63]. |
-| **Healthcare center** | Centro de saúde | [cite_start]Facilities that provide a wide range of medical services to citizens [cite: 32] [cite_start]and can administer various types of vaccines[cite: 32]. |
-| **Nurse** | Enfermeiro(a) | [cite_start]Personnel who use the application to view the list of users present at the center [cite: 54][cite_start], are authorized to access full health data of users [cite: 57][cite_start], administer the vaccine [cite: 58][cite_start], and record the event in the system [cite: 58][cite_start], including any observed adverse reactions[cite: 61]. |
-| **PVMS** | PVMS | [cite_start]Acronym for *Pandemic Vaccination Management System*[cite: 94]. |
-| **Receptionist** | Rececionista | [cite_start]Personnel who register an SNS user's arrival [cite: 52][cite_start], mark the user as ready in the system [cite: 53][cite_start], and may also assist users in scheduling appointments in person[cite: 48]. |
-| **SNS User** | Utente do SNS | [cite_start]A user of the national healthcare system[cite: 29, 30]. [cite_start]Must be registered in the system with data such as name, SNS user number, etc.[cite: 30]. [cite_start]They use the application to schedule appointments [cite: 29, 43] [cite_start]and obtain vaccination certificates[cite: 29]. |
-| **UI** | IU (Interface de Utilizador) | [cite_start]Acronym for *User Interface*[cite: 68]. [cite_start]The system envisions multiple dedicated UIs [cite: 68][cite_start], including a Web Application for DGS staff [cite: 69][cite_start], a mobile application for SNS users [cite: 70][cite_start], and a console-based UI for demonstration[cite: 72]. |
+| **Adverse Reaction** | Reação adversa | [cite_start]Any negative response observed after a vaccine is administered, recorded by the nurse with details such as severity, description, and notes.[cite: 61][cite_end] |
+| **API** | API | [cite_start]Acronym for *Application Programming Interface*. The server-side application exposes multiple APIs to support user applications.[cite: 97, 100][cite_end] |
+| **Appointment** | Marcação | [cite_start]A scheduled vaccination slot chosen by an SNS user, including date, time, vaccine type, and vaccination center, subject to capacity checks and confirmation.[cite: 29, 43][cite_end] |
+| **Capacity Check** | Verificação de capacidade | [cite_start]Business rule that validates whether a vaccination center has available capacity for a given timeslot, based on its maximum vaccines per hour.[cite: 29, 32][cite_end] |
+| **Community Mass Vaccination Center** | Centro de vacinação em massa comunitário | [cite_start]Temporary facilities established specifically to administer a single type of vaccine during an ongoing disease outbreak.[cite: 33][cite_end] |
+| **DGS** | DGS | [cite_start]Acronym for the Portuguese state-funded healthcare authority responsible for the National Vaccination Program.[cite: 7, 17, 28][cite_end] |
+| **DGS Administrator** | Administrador(a) da DGS | [cite_start]Personnel responsible for managing the application, including the registration of vaccination centers and personnel, and configuring core data such as vaccines and outbreaks.[cite: 62, 63][cite_end] |
+| **Healthcare Center** | Centro de saúde | [cite_start]Facilities that provide a wide range of medical services to citizens and can administer various types of vaccines.[cite: 32][cite_end] |
+| **Nurse** | Enfermeiro(a) | [cite_start]Personnel authorized to access users’ full health data, view the waiting queue, administer vaccines, record vaccination events, and log any adverse reactions.[cite: 54, 57, 58, 61][cite_end] |
+| **Notification Service** | Serviço de notificação | [cite_start]External service responsible for sending appointment confirmations and reminders to users after successful scheduling.[cite: 29][cite_end] |
+| **Outbreak** | Surto | [cite_start]Disease outbreak context for which the system suggests a default vaccine type during appointment scheduling.[cite: 29][cite_end] |
+| **PVMS** | PVMS | [cite_start]Acronym for *Pandemic Vaccination Management System*, the software product developed to manage the vaccination process in Portugal.[cite: 94][cite_end] |
+| **Receptionist** | Rececionista | [cite_start]Personnel who register an SNS user’s arrival, verify appointments, mark users as ready in the system, and may assist with in-person appointment scheduling.[cite: 48, 52, 53][cite_end] |
+| **SNS User** | Utente do SNS | [cite_start]A user of the National Health Service who can register, schedule vaccination appointments, and obtain vaccination certificates through the application.[cite: 29, 30, 43][cite_end] |
+| **UI** | IU (Interface de Utilizador) | [cite_start]Acronym for *User Interface*. The system envisions multiple UIs, including a web application for DGS staff, a mobile app for SNS users, and a console-based UI for demonstration purposes.[cite: 68, 70, 72][cite_end] |
+| **Vaccine** | Vacina / Marca | [cite_start]A concrete vaccine brand (e.g., Pfizer, Moderna) associated with a vaccine type; includes commercial name, brand, and technology used.[cite: 63][cite_end] |
+| **Vaccine Type** | Tipo de vacina | [cite_start]Core classification of a vaccine (e.g., Covid-19, Influenza), defined by code, disease, and a short description.[cite: 63][cite_end] |
+| **Vaccination Certificate** | Certificado de vacinação | [cite_start]Official document proving a vaccination event; can be issued on-site at healthcare centers upon user request.[cite: 29, 32][cite_end] |
+| **Vaccination Event** | Evento de vacinação | [cite_start]The record that captures the administration of a vaccine, including date/time, vaccine type, brand, and lot number, and may reference adverse reactions.[cite: 58, 61][cite_end] |
+
