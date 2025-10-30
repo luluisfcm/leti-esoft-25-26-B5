@@ -1,5 +1,5 @@
 @startuml
-title PVMS – Domain Model (Aligned and Corrected)
+title Domain Model
 
 hide methods
 skinparam classAttributeIconSize 0
