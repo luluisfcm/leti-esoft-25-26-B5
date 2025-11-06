@@ -1,13 +1,12 @@
 @startuml
-title PVMS – Domain Model (Aligned and Corrected)
+title PVMS – Domain Model
 
 hide methods
 skinparam classAttributeIconSize 0
 
 ' ===================== SNS Users =====================
 class SNSUser {
-  + snsNumber : String <<PK>>
-  --
+
   + name : String
   + dateOfBirth : Date
   + sex : String
@@ -19,8 +18,7 @@ class SNSUser {
 
 ' ===================== Staff =====================
 abstract StaffMember {
-  + id : Integer <<PK>>
-  --
+
   + name : String
   + postalAddress : String
   + phone : String
@@ -40,8 +38,7 @@ enum CenterType {
 }
 
 class VaccinationCenter {
-  + id : Integer <<PK>>
-  --
+
   + name : String
   + postalAddress : String
   + phone : String
@@ -58,15 +55,13 @@ VaccinationCenter "1" -- "0..*" VaccineType : supports
 
 ' ===================== Vaccines =====================
 class VaccineType {
-  + code : String <<PK>>
-  --
+
   + disease : String
   + shortDescription : String
 }
 
 class Vaccine {
-  + id : Integer <<PK>>
-  --
+
   + commercialName : String
   + brand : String
   + technologyUsed : String
@@ -86,8 +81,7 @@ enum AppointmentStatus {
 }
 
 class Appointment {
-  + id : Integer <<PK>>
-  --
+
   + date : Date
   + time : Time
   + status : AppointmentStatus
@@ -95,15 +89,13 @@ class Appointment {
 }
 
 class VaccinationEvent {
-  + id : Integer <<PK>>
-  --
+
   + lotNumber : String
   + administrationDateTime : DateTime
 }
 
 class AdverseReaction {
-  + id : Integer <<PK>>
-  --
+
   + description : String
   + severity : String
   + observedAt : DateTime
@@ -111,15 +103,13 @@ class AdverseReaction {
 }
 
 class VaccinationCertificate {
-  + id : Integer <<PK>>
-  --
+
   + issueDate : Date
 }
 
 ' ===================== Outbreak / Defaults =====================
 class Outbreak {
-  + id : Integer <<PK>>
-  --
+
   + name : String
   + startDate : Date
   + current : Boolean
