@@ -26,18 +26,12 @@ abstract StaffMember {
 }
 
 class Receptionist extends StaffMember
-class Nurse extends StaffMember {
-  + <<Note>> : Authorized to access full health data
-}
+class Nurse extends StaffMember
+note right of Nurse : Authorized to access full health data
 class DGSAdministrator extends StaffMember
 
 ' ===================== Centers =====================
-enum CenterType {
-  HealthcareCenter
-  CommunityMass
-}
-
-class VaccinationCenter {
+abstract VaccinationCenter {
 
   + name : String
   + postalAddress : String
@@ -47,11 +41,13 @@ class VaccinationCenter {
   + maxVaccinesPerHour : Integer
   + openingHours : Time
   + closingHours : Time
-  + type : CenterType
 }
 
+class HealthcareCenter extends VaccinationCenter
+class CommunityMassVaccinationCenter extends VaccinationCenter
+
 ' Which vaccine types a center can administer
-VaccinationCenter "1" -- "0..*" VaccineType : supports
+VaccinationCenter "1" -- "0..*" VaccineType : supports >
 
 ' ===================== Vaccines =====================
 class VaccineType {
@@ -67,7 +63,7 @@ class Vaccine {
   + technologyUsed : String
 }
 
-VaccineType "1" -- "1..*" Vaccine : has brands of
+VaccineType "1" -- "1..*" Vaccine : has brands of >
 
 ' ===================== Appointments & Events =====================
 enum AppointmentStatus {
@@ -116,20 +112,20 @@ class Outbreak {
 }
 
 ' ===================== Associations =====================
-SNSUser "1" -- "0..*" Appointment : schedules
-Appointment "0..*" -- "1" VaccinationCenter : at
-Appointment "0..*" -- "1" VaccineType : is for
+SNSUser "1" -- "0..*" Appointment : schedules >
+Appointment "0..*" -- "1" VaccinationCenter : at >
+Appointment "0..*" -- "1" VaccineType : is for >
 
-Appointment "1" -- "0..1" VaccinationEvent : results in
-VaccinationEvent "0..*" -- "1" Vaccine : records brand/lot of
-VaccinationEvent "1" -- "0..*" AdverseReaction : captures
+Appointment "1" -- "0..1" VaccinationEvent : results in >
+VaccinationEvent "0..*" -- "1" Vaccine : records brand/lot of >
+VaccinationEvent "1" -- "0..*" AdverseReaction : captures >
 
-SNSUser "1" -- "0..*" VaccinationCertificate : obtains
-VaccinationEvent "1" -- "1" VaccinationCertificate : documents
-Nurse "1" -- "0..*" VaccinationEvent : administers
-Nurse "1" -- "0..*" VaccinationCertificate : issues on-site
+SNSUser "1" -- "0..*" VaccinationCertificate : obtains >
+VaccinationEvent "1" -- "1" VaccinationCertificate : documents >
+Nurse "1" -- "0..*" VaccinationEvent : administers >
+Nurse "1" -- "0..*" VaccinationCertificate : issues on-site >
 
-StaffMember "0..*" -- "0..*" VaccinationCenter : works at
+StaffMember "0..*" -- "0..*" VaccinationCenter : works at >
 
-Outbreak "0..1" -- "1" VaccineType : defaultFor
+Outbreak "0..1" -- "1" VaccineType : defaultFor >
 @enduml
