@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title US10 - Sequence Diagram - Autenticar Utilizador
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":LoginView" as View
+participant ":AuthController" as Ctrl
+participant ":UserRepository" as Repo
+
+activate User
+
+User -> View: openLogin()
+View -> User: showLoginForm()
+
+User -> View: submitCredentials(userId, pwd)
+View -> Ctrl: authenticate(userId, pwd)
+activate Ctrl
+
+Ctrl -> Repo: findById(userId)
+activate Repo
+Repo --> Ctrl: user: User
+deactivate Repo
+
+Ctrl -> Ctrl: isValidCredentials(user, pwd)
+
+alt credenciais válidas
+    Ctrl --> View: authenticationSuccess(user)
+    View --> User: showHome()
+else credenciais inválidas
+    Ctrl --> View: authenticationFailed("Invalid credentials")
+    View --> User: showError("Invalid credentials")
+end
+
+deactivate Ctrl
+deactivate User
+
+@enduml

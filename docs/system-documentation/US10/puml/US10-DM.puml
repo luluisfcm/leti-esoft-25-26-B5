@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/class-diagram
+hide circle
+skinparam classAttributeIconSize 0
+hide methods
+
+title US10 - Domain Model - Autenticar Utilizador
+
+class User {
+    -id: string
+    -name: string
+    -email: string
+    -passwordHash: string
+    -isActive: bool
+}
+
+class Role {
+    -name: string
+    -description: string
+}
+
+' Um utilizador pode ter vários papéis
+User "1" -- "0..*" Role : has >
+
+@enduml

@@ -26,16 +26,16 @@ Finally, keep in mind that each User Story is not isolated — it must be integr
 
 **The following table must always be kept up to date.**
 
-| Task                                                                                               | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 |
-|----------------------------------------------------------------------------------------------------|:--------:|:--------:|:--------:|:--------:|
-| [Glossary](system-documentation/global-artifacts/glossary.md)                                      |   all    |   all    |   all    |   all    |
-| [Use Case Diagram (UCD)](puml/UCD.puml)                |   all    |   all    |   all    |   all    |
-| [Supplementary Specification](suplementary-specification.md) |   all    |   all    |   all    |   all    |
-| [Domain Model](system-documentation/global-artifacts/analysis.md)                                  |   all    |   all    |   all    |   all    |
-| [US01](system-documentation/US01) (SDP Activities)                                                 |          | 1XXXXXX  |          |          |
-| [US02](system-documentation/US02) (SDP Activities)                                                 |          | 1XXXXXX  |          |          |
-| [US03](system-documentation/US03) (SDP Activities)                                                 |          | 1XXXXXX  |          |          |
-| ...                                                                                                |   ...    |   ...    |   ...    |   ...    |
-| ...                                                                                                |   ...    |   ...    |   ...    |   ...    |
-
-
+| Task                                                              | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 |
+|-------------------------------------------------------------------|:--------:|:--------:|:--------:|:--------:|
+| [Glossary](system-documentation/global-artifacts/glossary.md)     |   all    |   all    |   all    |   all    |
+| [Use Case Diagram (UCD)](puml/UCD.puml)                           |   all    |   all    |   all    |   all    |
+| [Supplementary Specification](suplementary-specification.md)      |   all    |   all    |   all    |   all    |
+| [Domain Model](system-documentation/global-artifacts/analysis.md) |   all    |   all    |   all    |   all    |
+| [US01](system-documentation/US01) (SDP Activities)                |          | 1XXXXXX  |          |          |
+| [US02](system-documentation/US02) (SDP Activities)                |          | 1XXXXXX  |          |          |
+| [US03](system-documentation/US03) (SDP Activities)                |          | 1XXXXXX  |          |          |
+| [US10](...)                                                       |   ...    | 1222100  |   ...    |   ...    |
+| [US11](...)                                                       |   ...    | 1230593  |   ...    |   ...    |
+| [US15](...)                                                       |   ...    | 1221432  |   ...    |   ...    |
+| [US14](...)                                                       |   ...    | 1231479  |   ...    |   ...    |

@@ -1,0 +1,43 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+skinparam classAttributeIconSize 0
+
+title US10 - Class Diagram - Efetuar Login
+
+' ===== View =====
+class LoginView {
+}
+
+' ===== Controller =====
+class LoginController {
+    +authenticate(string userId, string pwd): bool
+}
+
+' ===== Class1 (serviço de domínio / aplicação) =====
+class AuthService {
+    -designation: string
+    +doLogin(string userId, string pwd): UserToken
+}
+
+' ===== Class2 (entidade de domínio) =====
+class User {
+    -id: string
+    -name: string
+    -address: string
+    -password: string
+}
+
+' ===== Tipo de retorno =====
+class UserToken {
+    -token: string
+    -expiration: DateTime
+}
+
+' ===== Relações (iguais ao template) =====
+LoginView ..> LoginController
+LoginController ..> AuthService
+AuthService "1" -- "0..*" User : knows >
+
+@enduml
