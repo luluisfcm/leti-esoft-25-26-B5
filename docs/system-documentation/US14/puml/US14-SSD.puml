@@ -1,0 +1,25 @@
+@startuml
+title US14 - System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "Administrator" as Admin
+participant ":System" as System
+
+activate Admin
+
+Admin -> System: asks to register a new employee
+System --> Admin: requests data (Name, Address, Phone, Email, CC Number)
+
+Admin -> System: types requested data
+System --> Admin: requests the role (Function)
+
+Admin -> System: selects the role (e.g. Nurse, Receptionist)
+System --> Admin: shows the data and requests confirmation
+
+Admin -> System: confirms data
+System --> Admin: informs operation success
+
+deactivate Admin
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+title US14 - Class Diagram
+
+hide circle
+skinparam classAttributeIconSize 0
+
+' Camada de Interface
+class RegisterEmployeeUI {
+}
+
+' Camada de Controle
+class RegisterEmployeeController {
+    + createEmployee(EmployeeDTO dto) : boolean
+    + saveEmployee() : boolean
+}
+
+' Camada de Domínio / Persistência
+class Company {
+    + getEmployeeStore() : EmployeeStore
+}
+
+class EmployeeStore {
+    + createEmployee(EmployeeDTO dto) : StaffMember
+    + validateUniqueness(email, phone) : boolean
+    + saveEmployee(StaffMember emp) : boolean
+}
+
+' Classes de Domínio (Refletem o DM, mas com métodos)
+abstract class StaffMember {
+    - name : String
+    - postalAddress : String
+    - phone : String
+    - email : String
+    - citizenCardNumber : String
+    + StaffMember(name, address, phone, email, ccNum)
+    - validateData()
+}
+
+class Nurse extends StaffMember
+class Receptionist extends StaffMember
+class DGSAdministrator extends StaffMember
+
+' Relações
+RegisterEmployeeUI ..> RegisterEmployeeController
+RegisterEmployeeController ..> Company
+RegisterEmployeeController ..> EmployeeStore
+RegisterEmployeeController ..> StaffMember
+
+Company "1" --> "1" EmployeeStore : uses >
+EmployeeStore "1" --> "0..*" StaffMember : stores >
+
+@enduml
