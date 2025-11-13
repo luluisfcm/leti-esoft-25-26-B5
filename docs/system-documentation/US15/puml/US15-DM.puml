@@ -1,0 +1,45 @@
+@startuml
+'h https://plantuml.com/class-diagram
+hide circle
+hide methods
+skinparam classAttributeIconSize 0
+
+title US15 – Domain Model Excerpt (List Employees by Role)
+
+' ===== Staff (Roles modeled by subclassing) =====
+abstract StaffMember {
+  + name : String
+  + postalAddress : String
+  + phone : String
+  + email : String
+}
+class Receptionist extends StaffMember
+class Nurse extends StaffMember
+class DGSAdministrator extends StaffMember
+
+note right of StaffMember : Base class for all staff; role determined by subclass
+note right of DGSAdministrator : Initiates employee listing by role
+
+' ===== Vaccination Centers (same style as global DM) =====
+abstract VaccinationCenter {
+  + name : String
+  + postalAddress : String
+  + phone : String
+  + email : String
+  + website : String
+  + maxVaccinesPerHour : Integer
+  + openingHours : Time
+  + closingHours : Time
+}
+class HealthcareCenter extends VaccinationCenter
+class CommunityMassVaccinationCenter extends VaccinationCenter
+
+note right of VaccinationCenter : Centers where staff work; not all attributes used in US15
+
+' ===== Associations (direction indicated with trailing > in label text) =====
+StaffMember "0..*" -- "0..*" VaccinationCenter : works at >
+
+' Optional clarification note
+note right of Nurse : Has access to extended health data (context from global DM)
+
+@enduml
