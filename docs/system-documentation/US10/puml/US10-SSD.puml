@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title US10 - System Sequence Diagram - Autenticar Utilizador
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":System" as System
+
+activate User
+
+User -> System: requestLoginScreen()
+System --> User: showLoginForm()
+
+User -> System: authenticate(userId, pwd)
+activate System
+
+' Validação interna do sistema (não detalhada aqui)
+System --> User: authenticationResult(success/failure)
+
+deactivate System
+deactivate User
+
+@enduml
