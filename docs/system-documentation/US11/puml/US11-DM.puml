@@ -1,0 +1,24 @@
+@startuml
+title US11 – Domain Model View – Register Vaccine
+
+hide circle
+skinparam classAttributeIconSize 0
+hide methods
+
+
+class VaccineType {
+
+  + disease : String
+  + shortDescription : String
+}
+
+class Vaccine {
+
+  + commercialName : String
+  + brand : String
+  + technologyUsed : String
+}
+
+VaccineType "1" -- "1..*" Vaccine : has brands of
+
+@enduml

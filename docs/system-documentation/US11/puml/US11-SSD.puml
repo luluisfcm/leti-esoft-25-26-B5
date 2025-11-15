@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title US11 - System Sequence Diagram - Register Vaccine
+
+autoactivate on
+autonumber
+
+actor "Administrator" as Admin
+participant ":PVMS" as System
+
+activate Admin
+
+Admin -> System: registerVaccine(commercialName,\nbrand, typeCode, technologyUsed)
+System --> Admin: registerVaccineResult(success / error)
+
+@enduml

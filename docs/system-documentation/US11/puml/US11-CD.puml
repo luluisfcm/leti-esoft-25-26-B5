@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+skinparam classAttributeIconSize 0
+
+title US11 - Class Diagram - Register Vaccine
+
+class RegisterVaccineView {
+
+}
+
+class RegisterVaccineController {
+    +registerVaccine(string commercialName, string brand, string typeCode, string technologyUsed): void
+}
+
+class VaccineRegistry {
+    +registerVaccine(string commercialName, string brand, string typeCode, string technologyUsed): void
+}
+
+class VaccineType {
+    -disease
+    -shortDescription
+}
+
+class Vaccine {
+    -commercialName
+    -brand
+    -technologyUsed
+}
+
+RegisterVaccineView ..> RegisterVaccineController
+RegisterVaccineController ..> VaccineRegistry
+
+VaccineRegistry"1" -> "0..*" Vaccine : manages
+Vaccine "0..*" -> "1" VaccineType : is of type
+
+@enduml
