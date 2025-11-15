@@ -1,26 +1,30 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+' US10-SSD.puml
+' Baseado na estrutura da imagem.png (template USXX-SSD.puml)
 
-title US10 - System Sequence Diagram - Autenticar Utilizador
+title US10 - Specify a new vaccine type
 
 autoactivate on
 autonumber
 
-actor "User" as User
+' Mapeado de User -> Administrator
+actor "Administrator" as Admin
+' Mapeado de :System
 participant ":System" as System
 
-activate User
+activate Admin
 
-User -> System: requestLoginScreen()
-System --> User: showLoginForm()
+' Mapeado de "Authentication request"
+Admin -> System: requests to specify a new vaccine type
 
-User -> System: authenticate(userId, pwd)
-activate System
+' Mapeado de "Authentication response"
+System --> Admin: requests data (code, description)
 
-' Validação interna do sistema (não detalhada aqui)
-System --> User: authenticationResult(success/failure)
+' Mapeado de "Another authentication request"
+Admin -> System: provides data
 
-deactivate System
-deactivate User
+' Mapeado de "Another authentication response"
+System --> Admin: informs operation success
 
+deactivate Admin
 @enduml

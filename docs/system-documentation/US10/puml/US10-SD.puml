@@ -1,41 +1,48 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+' US10-SD.puml
+' Baseado na estrutura da imagem.png (template USXX-SD.puml)
 
-title US10 - Sequence Diagram - Autenticar Utilizador
+title US10 - Specify a new vaccine type
 
 autoactivate on
 autonumber
 
-actor "User" as User
-participant ":LoginView" as View
-participant ":AuthController" as Ctrl
-participant ":UserRepository" as Repo
+' Mapeado de User -> Administrator
+actor "Administrator" as Admin
+' Mapeado de :xxxxView -> :CreateVaccineTypeView
+participant ":CreateVaccineTypeView" as View
+' Mapeado de :xxxxController -> :CreateVaccineTypeController
+participant ":CreateVaccineTypeController" as Ctrl
+' Mapeado de :Class1 -> admin:DGSAdministrator
+participant "admin:DGSAdministrator" as AdminRole
 
-activate User
+activate Admin
 
-User -> View: openLogin()
-View -> User: showLoginForm()
+' Mapeado de "Authentication request"
+Admin -> View: Requests to specify a new vaccine type
+activate View
 
-User -> View: submitCredentials(userId, pwd)
-View -> Ctrl: authenticate(userId, pwd)
+' Mapeado de "authenticate(userId, pwd)"
+' Assumindo que a View já recolheu os dados (code, desc)
+View -> Ctrl: createVaccineType(code, desc)
 activate Ctrl
 
-Ctrl -> Repo: findById(userId)
-activate Repo
-Repo --> Ctrl: user: User
-deactivate Repo
+' Mapeado de "doLogIn(userId, pwd)"
+Ctrl -> AdminRole: specifyVaccineType(code, desc)
+activate AdminRole
 
-Ctrl -> Ctrl: isValidCredentials(user, pwd)
+' Mapeado de "userToken" (retorno do trabalho)
+' Retorna o objeto criado ou um status
+AdminRole --> Ctrl: vaccineType
+deactivate AdminRole
 
-alt credenciais válidas
-    Ctrl --> View: authenticationSuccess(user)
-    View --> User: showHome()
-else credenciais inválidas
-    Ctrl --> View: authenticationFailed("Invalid credentials")
-    View --> User: showError("Invalid credentials")
-end
-
+' Mapeado de "ok"
+Ctrl --> View: (operationSuccess)
 deactivate Ctrl
-deactivate User
+
+' Mapeado de "Authentication response"
+View --> Admin: Informs operation success
+deactivate View
+deactivate Admin
 
 @enduml
