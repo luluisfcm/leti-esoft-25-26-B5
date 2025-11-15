@@ -1,0 +1,21 @@
+@startuml
+title US11 - Sequence Diagram - Register Vaccine
+
+autoactivate on
+autonumber
+
+actor "Administrator" as Admin
+participant ":RegisterVaccineView" as View
+participant ":RegisterVaccineController" as Ctrl
+participant ":VaccineRegistry" as Registry
+
+activate Admin
+
+Admin -> View: Register vaccine request
+View -> Ctrl: registerVaccine(commercialName,\nbrand, typeCode, technologyUsed)
+Ctrl -> Registry: registerVaccine(commercialName,\nbrand, typeCode, technologyUsed)
+Registry --> Ctrl: result (success / error)
+Ctrl --> View: showResult(message)
+View --> Admin: Register vaccine response
+
+@enduml
