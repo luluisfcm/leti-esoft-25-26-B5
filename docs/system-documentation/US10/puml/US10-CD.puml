@@ -1,43 +1,44 @@
 @startuml
-'https://plantuml.com/class-diagram
+' US10-CD.puml
+' Baseado na estrutura da imagem.png
 
+title US10 - Class Diagram
 hide circle
+
 skinparam classAttributeIconSize 0
+hide empty_methods
 
-title US10 - Class Diagram - Efetuar Login
-
-' ===== View =====
-class LoginView {
+' Mapeado de xxxxView
+class CreateVaccineTypeView {
 }
 
-' ===== Controller =====
-class LoginController {
-    +authenticate(string userId, string pwd): bool
+' Mapeado de xxxxController
+class CreateVaccineTypeController {
+    +createVaccineType(string code, string desc): bool
 }
 
-' ===== Class1 (serviço de domínio / aplicação) =====
-class AuthService {
-    -designation: string
-    +doLogin(string userId, string pwd): UserToken
+' Mapeado de Class1
+class DGSAdministrator {
+    ' Atributos herdados...
+    ---
+    +specifyVaccineType(string code, string desc): VaccineType
 }
 
-' ===== Class2 (entidade de domínio) =====
-class User {
-    -id: string
-    -name: string
-    -address: string
-    -password: string
+' Mapeado de Class2
+class VaccineType {
+    -code: String
+    -description: String
+    +disease : String
+    +shortDescription : String
+    ---
+    +VaccineType(code, desc)
 }
 
-' ===== Tipo de retorno =====
-class UserToken {
-    -token: string
-    -expiration: DateTime
-}
+' Dependências
+CreateVaccineTypeView ..> CreateVaccineTypeController
+CreateVaccineTypeController ..> DGSAdministrator
 
-' ===== Relações (iguais ao template) =====
-LoginView ..> LoginController
-LoginController ..> AuthService
-AuthService "1" -- "0..*" User : knows >
+' Associação "1 knows 0..*"
+DGSAdministrator "1" -> "0..*" VaccineType: specifies >
 
 @enduml

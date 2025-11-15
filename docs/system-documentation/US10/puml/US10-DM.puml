@@ -1,25 +1,26 @@
 @startuml
-'https://plantuml.com/class-diagram
+' US10-MD.puml
+' Baseado na estrutura da imagem.png (template USXX-DM.puml )
+
+title US10 - Domain Model
+
 hide circle
 skinparam classAttributeIconSize 0
 hide methods
 
-title US10 - Domain Model - Autenticar Utilizador
-
-class User {
-    -id: string
-    -name: string
-    -email: string
-    -passwordHash: string
-    -isActive: bool
+' Mapeado de Concept1  -> DGSAdministrator
+class DGSAdministrator {
+    - name: String
 }
 
-class Role {
-    -name: string
-    -description: string
+' Mapeado de Concept2  -> VaccineType
+' Atributos baseados nos requisitos da US10 (code, description)
+class VaccineType {
+    - code: String
+    - description: String
 }
 
-' Um utilizador pode ter vários papéis
-User "1" -- "0..*" Role : has >
+' Mapeado da associação "1 knows 0..*"
+DGSAdministrator "1" -> "0..*" VaccineType : specifies >
 
 @enduml
