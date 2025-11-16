@@ -1,29 +1,24 @@
 @startuml
-title US14 - Domain Model Excerpt
+title US14 - Domain Model
 
 hide methods
 hide circle
 skinparam classAttributeIconSize 0
 
-' Conceitos do Negócio baseados no DM original [cite: 2]
+
 abstract class StaffMember {
-  - name : String
-  - postalAddress : String
-  - phone : String
-  - email : String
-  - citizenCardNumber : String
+  - name
+  - postalAddress
+  - phone
+  - email
+  - citizenCardNumber
 }
 
 class Receptionist extends StaffMember
 class Nurse extends StaffMember
 class DGSAdministrator extends StaffMember
 
-' Notas de Regras de Negócio (Business Rules)
-note right of StaffMember
-  **AC14-1:** Each employee has a single role (Subclass).
-  **AC14-2:** Name, Phone, Email are mandatory.
-  **AC14-3:** Phone and CC Number must be valid PT format.
-  **AC14-4:** Phone and Email must be unique in the system.
-end note
+
+
 
 @enduml

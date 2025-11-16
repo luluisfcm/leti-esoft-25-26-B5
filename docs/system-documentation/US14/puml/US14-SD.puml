@@ -22,11 +22,9 @@ UI --> Admin: requests role
 Admin -> UI: selects role (roleId)
 UI -> Ctrl: createEmployee(dto)
 
-' Obter a Store (Padrão Expert/Creator)
 Ctrl -> Comp: getEmployeeStore()
 Comp --> Ctrl: store
 
-' Validação de Unicidade (AC14-4)
 Ctrl -> Store: createEmployee(dto)
     Store -> Store: validateUniqueness(email, phone)
     note right
@@ -34,7 +32,6 @@ Ctrl -> Store: createEmployee(dto)
       already exist in the list
     end note
 
-    ' Criação com base no Role (AC14-1)
     Store -> Emp: create(name, address, phone, email, ccNum)
         Emp -> Emp: validateData()
         note right

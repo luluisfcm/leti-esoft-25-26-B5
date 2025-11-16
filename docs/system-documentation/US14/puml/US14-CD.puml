@@ -4,17 +4,15 @@ title US14 - Class Diagram
 hide circle
 skinparam classAttributeIconSize 0
 
-' Camada de Interface
+
 class RegisterEmployeeUI {
 }
 
-' Camada de Controle
 class RegisterEmployeeController {
     + createEmployee(EmployeeDTO dto) : boolean
     + saveEmployee() : boolean
 }
 
-' Camada de Domínio / Persistência
 class Company {
     + getEmployeeStore() : EmployeeStore
 }
@@ -25,7 +23,6 @@ class EmployeeStore {
     + saveEmployee(StaffMember emp) : boolean
 }
 
-' Classes de Domínio (Refletem o DM, mas com métodos)
 abstract class StaffMember {
     - name : String
     - postalAddress : String
@@ -40,7 +37,6 @@ class Nurse extends StaffMember
 class Receptionist extends StaffMember
 class DGSAdministrator extends StaffMember
 
-' Relações
 RegisterEmployeeUI ..> RegisterEmployeeController
 RegisterEmployeeController ..> Company
 RegisterEmployeeController ..> EmployeeStore
