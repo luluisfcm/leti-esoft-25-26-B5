@@ -1,40 +1,26 @@
 @startuml
 'https://plantuml.com/sequence-diagram
-title US15 – Sequence Diagram (List Employees by Role)
+
+title US15 - List Employees by Role (Sequence Diagram)
+
 autoactivate on
 autonumber
-actor "DGS Administrator" as ADM
-participant ":AdminUI" as UI
-participant ":StaffController" as Ctrl
-participant ":StaffService" as Svc
+
+actor "Administrator" as ADM
+participant ":ListEmployeesByRoleUI" as UI
+participant ":ListEmployeesByRoleController" as Ctrl
 participant ":StaffRepository" as Repo
+
 activate ADM
 
-note right of ADM : Initiates listing of employees by selected role
-note right of UI : UI captures role filter and triggers request
-note right of Svc : Applies business rules (validate role, etc.)
-note right of Repo : Data access (findByRole)
+ADM -> UI: Request list of employees by role
+UI -> ADM: Ask for role/function
+ADM --> UI: Enter role (e.g. "Nurse")
 
-ADM -> UI : Select role & request list >
-UI -> Ctrl : listEmployeesByRole(role) >
-Ctrl -> Svc : getEmployeesByRole(role) >
-Svc -> Repo : findByRole(role) >
-Repo --> Svc : List<StaffMember>
-Svc --> Ctrl : List<StaffMember>
-Ctrl --> UI : List<StaffMember>
-UI --> ADM : Show staff list >
-
-opt No staff members found
-  Repo --> Svc : Empty list
-  Svc --> Ctrl : Empty list
-  Ctrl --> UI : Empty list
-  UI --> ADM : Show "No employees for role" >
-end
-
-alt Invalid role
-  Svc --> Ctrl : Error (InvalidRole) >
-  Ctrl --> UI : Error (InvalidRole) >
-  UI --> ADM : Show error message >
-end
+UI -> Ctrl: listEmployeesByRole(role)
+Ctrl -> Repo: findByRole(role)
+Repo --> Ctrl: list<StaffMember>
+Ctrl --> UI: list<StaffMember>
+UI --> ADM: Show employees for selected role
 
 @enduml
