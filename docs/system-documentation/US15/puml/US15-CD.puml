@@ -1,63 +1,49 @@
 @startuml
+
 'https://plantuml.com/class-diagram
 
 hide circle
 skinparam classAttributeIconSize 0
 
-title US15 — List employees by role
+title US15 - List Employees by Role (Class Diagram)
 
-' ===== UI / Controller / Service / Repository =====
-class AdminUI
-class StaffController {
-  +listEmployeesByRole(role: StaffRole): List<StaffMember>
-}
-class StaffService {
-  +getEmployeesByRole(role: StaffRole): List<StaffMember>
-}
-class StaffRepository {
-  +findByRole(role: StaffRole): List<StaffMember>
+
+class ListEmployeesByRoleUI {
+
 }
 
-enum StaffRole {
-  Receptionist
-  Nurse
-  DGSAdministrator
+
+class ListEmployeesByRoleController {
+
+  +listEmployeesByRole(roleName : String) : List<StaffMember>
 }
 
-note right of StaffRole : Used as a filter parameter in the application layer
 
-' ===== Domain (per DM) =====
-abstract StaffMember {
-  +name : String
-  +postalAddress : String
-  +phone : String
-  +email : String
+class StaffMember {
+
+  + name : String
+  + postalAddress : String
+  + phone : String
+  + email : String
 }
+
 class Receptionist extends StaffMember
 class Nurse extends StaffMember
 class DGSAdministrator extends StaffMember
 
-' Centers in the same style as StaffMember
-abstract VaccinationCenter {
-  +name : String
-  +postalAddress : String
-  +phone : String
-  +email : String
-  +website : String
-  +maxVaccinesPerHour : Integer
-  +openingHours : Time
-  +closingHours : Time
+class StaffRepository {
+
+  +findByRole(roleName : String) : List<StaffMember>
 }
-class HealthcareCenter extends VaccinationCenter
-class CommunityMassVaccinationCenter extends VaccinationCenter
 
-' ===== Associations with reading-direction arrow in label =====
-AdminUI ..> StaffController : requests list >
-StaffController ..> StaffService : delegates >
-StaffService ..> StaffRepository : queries >
-StaffMember "0..*" -- "0..*" VaccinationCenter : works at >
+ListEmployeesByRoleUI ..> ListEmployeesByRoleController
 
-' Place notes after elements exist to avoid forward-ref issues
-note right of DGSAdministrator : Authorized to list employees by role
+ListEmployeesByRoleController ..> StaffRepository
+
+StaffRepository "1" --> "0..*" StaffMember : manages >
+
+Receptionist --|> StaffMember
+Nurse --|> StaffMember
+DGSAdministrator --|> StaffMember
 
 @enduml

@@ -1,17 +1,17 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
-title US15 – System Sequence Diagram (List Employees by Role)
+title US15 - System Sequence Diagram (List Employees by Role)
 
 autoactivate on
 autonumber
 
-actor "DGS Administrator" as ADM
-participant ":PVMS System" as SYS
+actor "Administrator" as ADM
+participant ":System" as System
 
 activate ADM
 
-ADM -> SYS: Request employee list for role >
-SYS --> ADM: Employee list >
+ADM -> System: Request list of employees by role (role)
+System --> ADM: Show list of employees for given role
 
 @enduml
