@@ -1,0 +1,23 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autoactivate on
+autonumber
+
+actor "DGS Administrator" as Admin
+participant "System" as System
+
+activate Admin
+
+Admin -> System: asks to register a vaccination center
+System --> Admin: requests center data \n(name, address, phone, email, website,\nmaxVaccinesPerHour, openingHours, closingHours, type)
+
+Admin -> System: types requested center data
+System --> Admin: if Community Center, shows vaccine types and asks to select at least one
+
+Admin -> System: selects vaccine type(s)
+System --> Admin: shows all data and requests confirmation
+
+Admin -> System: confirms the data
+System --> Admin: informs operation success
+
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+' https://plantuml.com/class-diagram
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+' ===================== Administrator =====================
+class DGSAdministrator {
+    + name
+    + email
+}
+
+' ===================== Vaccination Centers =====================
+abstract class VaccinationCenter {
+    - name
+    - postalAddress
+    - phone
+    - email
+    - website
+    - maxVaccinesPerHour
+    - openingHours
+    - closingHours
+}
+
+class HealthcareCenter
+class CommunityMassVaccinationCenter
+
+VaccinationCenter <|-- HealthcareCenter
+VaccinationCenter <|-- CommunityMassVaccinationCenter
+
+' ===================== Vaccine Type =====================
+class VaccineType {
+    - disease
+    - shortDescription
+}
+
+' ===================== Associations =====================
+
+' Administrator registers vaccination centers
+DGSAdministrator "1" -- "0..*" VaccinationCenter : registers >
+
+' AC13-1: Community centers MUST define vaccine types
+CommunityMassVaccinationCenter "1" -- "1..*" VaccineType : administers >
+
+' Other centers may optionally support vaccine types
+VaccinationCenter "1" -- "0..*" VaccineType : supports >
+
+@enduml

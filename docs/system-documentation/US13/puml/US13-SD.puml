@@ -1,0 +1,59 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autoactivate on
+autonumber
+
+actor "DGS Administrator" as Admin
+participant ":RegisterVaccinationCenterView" as System
+participant ":RegisterVaccinationCenterController" as Ctrl
+participant "service\n:VaccinationCenterService" as Service
+participant "srvVaccines:\nVaccineTypeService" as SrvVaccines
+participant "dto:VaccinationCenterDto" as CenterDto
+participant "repoCenters\n:VaccinationCenterRepository" as RepoCenter
+participant "repoVaccines\n:VaccineTypeRepository" as RepoVaccine
+participant "center:VaccinationCenter" as Center
+participant "vaccine:VaccineType" as Vaccine
+participant "lstVaccinesDto\n:List<VaccineTypeDto>" as LstVaccinesDto
+
+activate Admin
+
+Admin -> System: asks to register a vaccination center
+System -> Ctrl: start()
+
+Ctrl -> SrvVaccines: getVaccineTypes()
+SrvVaccines --> Ctrl: lstVaccinesDto
+Ctrl --> System: lstVaccinesDto
+
+System --> Admin: requests center data \n(name, address, phone, email, website,\nmaxVaccinesPerHour, openingHours, closingHours, type)
+System --> Admin: if Community Center, select vaccine types
+Admin -> System: types all requested data and selects vaccine types
+
+System --> CenterDto**: create(name, address, phone, email, website,\nmaxPerHour, opening, closing, type, vaccineTypeIds)
+System --> Admin: shows all data and requests confirmation
+Admin -> System: confirms the data
+
+System -> Ctrl: registerVaccinationCenter(dto)
+Ctrl -> Service: register(dto)
+
+loop for each vaccineTypeId
+Service -> CenterDto: getVaccineTypeIds()
+CenterDto --> Service: vaccineTypeId
+Service -> RepoVaccine: getById(vaccineTypeId)
+RepoVaccine --> Service: vaccine
+end
+
+note over Service, CenterDto: extracting data from DTO
+
+Service --> Center**: create(name, address, phone, email, website,\nmaxPerHour, opening, closing, type, vaccines)
+
+Service -> Service: validate(center)
+Service --> Service: ok
+
+Service -> RepoCenter: save(center)
+RepoCenter --> Service: ok
+
+Service --> Ctrl: ok
+Ctrl --> System: ok
+System --> Admin: informs operation success
+
+@enduml
