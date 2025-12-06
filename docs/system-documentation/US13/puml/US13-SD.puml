@@ -7,22 +7,23 @@ actor "DGS Administrator" as Admin
 participant ":RegisterVaccinationCenterView" as System
 participant ":RegisterVaccinationCenterController" as Ctrl
 participant "service\n:VaccinationCenterService" as Service
-participant "srvVaccines:\nVaccineTypeService" as SrvVaccines
 participant "dto:VaccinationCenterDto" as CenterDto
 participant "repoCenters\n:VaccinationCenterRepository" as RepoCenter
 participant "repoVaccines\n:VaccineTypeRepository" as RepoVaccine
 participant "center:VaccinationCenter" as Center
 participant "vaccine:VaccineType" as Vaccine
-participant "lstVaccinesDto\n:List<VaccineTypeDto>" as LstVaccinesDto
+participant "lstVaccines\n:List<VaccineType>" as LstVaccines
 
 activate Admin
 
 Admin -> System: asks to register a vaccination center
 System -> Ctrl: start()
 
-Ctrl -> SrvVaccines: getVaccineTypes()
-SrvVaccines --> Ctrl: lstVaccinesDto
-Ctrl --> System: lstVaccinesDto
+Ctrl -> Service: getVaccineTypes()
+Service -> RepoVaccine: getAll()
+RepoVaccine --> Service: lstVaccines
+Service --> Ctrl: lstVaccines
+Ctrl --> System: lstVaccines
 
 System --> Admin: requests center data \n(name, address, phone, email, website,\nmaxVaccinesPerHour, openingHours, closingHours, type)
 System --> Admin: if Community Center, select vaccine types
