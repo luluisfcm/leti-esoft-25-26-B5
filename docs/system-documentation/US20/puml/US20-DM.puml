@@ -1,0 +1,32 @@
+@startuml
+title US20 - Domain Model
+hide methods
+hide circles
+skinparam classAttributeIconSize 0
+
+class DGSAdministrator {
+    - name
+    - email
+}
+
+class Receptionist {
+    - employeeID
+}
+
+class SNSUser {
+    - name
+    -dateOfBirth
+    -sex
+    -postalAddress
+    -phoneNumber
+    -email
+    -citizenCardNumber
+    -snsUserNumber
+}
+
+' Relations based on your structure
+DGSAdministrator "1" -- "*" SNSUser : manages >
+DGSAdministrator "1" -- "*" Receptionist : manages >
+Receptionist "1" -- "*" SNSUser : registers >
+
+@enduml

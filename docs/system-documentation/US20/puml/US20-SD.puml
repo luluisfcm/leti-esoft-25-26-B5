@@ -1,0 +1,85 @@
+@startuml
+title US20 - Register SNS User (SD)
+autonumber
+
+actor "Receptionist" as Rec
+participant ":RegisterSNSUserView" as UI
+participant ":RegisterSNSUserController" as Ctrl
+participant "service\n:SNSUserService" as Svc
+participant "dto:SNSUserDto" as DTO
+participant "repoUsers\n:SNSUserRepository" as Repo
+participant "user:SNSUser" as Dom
+
+activate Rec
+
+Rec -> UI : asks to register a new SNS User
+activate UI
+
+UI -> Ctrl : start()
+activate Ctrl
+Ctrl --> UI : ready
+deactivate Ctrl
+
+UI --> Rec : requests user data (name, address, sex, phone, email,\nbirthDate, citizenCard, snsUserNumber)
+deactivate UI
+
+Rec -> UI : types requested data
+activate UI
+
+    note right of UI
+        AC20-2: Sex is optional.
+        Other fields are required.
+        UI collects data.
+    end note
+
+    UI -> DTO** : create(name, address, sex, phone, email,\nbirthDate, citizenCard, snsUserNumber)
+
+    UI -> Ctrl : registerSNSUser(dto)
+    activate Ctrl
+
+        Ctrl -> Svc : register(dto)
+        activate Svc
+
+            note over Svc, DTO
+                extracting data from DTO
+            end note
+
+            ' AC20-3: Uniqueness Check
+            group Verifying Uniqueness (AC20-3)
+                Svc -> Repo : existsUser(phone, email, citizenCard, snsUserNumber)
+                activate Repo
+                Repo --> Svc : false (does not exist)
+                deactivate Repo
+            end
+
+            ' Creating the Domain Object
+            Svc -> Dom** : create(name, address, sex, phone, email,\nbirthDate, citizenCard, snsUserNumber)
+
+            ' Validating Business Rules (AC20-1 & AC20-2)
+            Svc -> Dom : validate()
+            activate Dom
+                note right of Dom
+                    Validates required fields.
+                    Validates PT format for
+                    Phone & Citizen Card (AC20-1).
+                end note
+            Dom --> Svc : ok
+            deactivate Dom
+
+            ' Persistence
+            Svc -> Repo : save(user)
+            activate Repo
+            Repo --> Svc : ok
+            deactivate Repo
+
+        Svc --> Ctrl : ok
+        deactivate Svc
+
+    Ctrl --> UI : ok
+    deactivate Ctrl
+
+UI --> Rec : informs operation success
+deactivate UI
+
+deactivate Rec
+@enduml
