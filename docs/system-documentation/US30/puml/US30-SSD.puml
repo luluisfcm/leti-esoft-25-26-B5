@@ -1,0 +1,36 @@
+```plantuml
+@startuml
+title US30 - System Sequence Diagram - Schedule Vaccine Administration
+
+autoactivate on
+autonumber
+
+actor "SNS User" as SNSUser
+participant ":PVMS" as System
+
+' 1. User accesses scheduling feature
+SNSUser -> System: requestScheduleVaccine()
+System --> SNSUser: displayScheduleForm()
+
+' 2. User selects vaccine type
+SNSUser -> System: selectVaccineType(vaccineType)
+System --> SNSUser: showAvailableCenters(vaccineType)
+
+' 3. User selects vaccination center
+SNSUser -> System: selectVaccinationCenter(center)
+System --> SNSUser: showAvailableTimeSlots(center, vaccineType)
+
+' 4. User selects date/time slot and provides contact details
+SNSUser -> System: submitScheduleData(vaccineType,center,selectedTimeSlot,contactInfo)
+System --> SNSUser: showSchedulePreview(appointmentData)
+
+' 5. User confirms scheduling
+SNSUser -> System: confirmSchedule()
+
+alt appointment successfully created
+    System --> SNSUser: showScheduleConfirmation(appointmentId,vaccineType,center,dateTime)
+else slot unavailable, validation error,or existing future appointment
+    System --> SNSUser: showScheduleError(errorMessage)
+end
+
+@enduml

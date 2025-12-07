@@ -1,0 +1,77 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autoactivate on
+autonumber
+
+actor "SNS User" as User
+participant ":ScheduleVaccineView" as View
+participant ":ScheduleVaccineController" as Ctrl
+participant ":ScheduleService" as Service
+participant "repo:VaccineTypeRepository" as VTRepo
+participant "repo:VaccinationCenterRepository" as CenterRepo
+participant "container:VaccineAppointmentContainer" as AppContainer
+participant "dto:ScheduleVaccineRequest" as Request
+participant "dto:SchedulePreviewDTO" as Preview
+participant "appt:VaccineAppointment" as Appointment
+
+activate User
+
+' --- STEP 1: User opens the scheduling feature ---
+User -> View: requests to schedule vaccination
+View -> Ctrl: requestScheduleVaccine()
+Ctrl -> Service: getInitialData()
+Service -> VTRepo: findAll()
+VTRepo --> Service: vaccineTypes
+Service -> CenterRepo: findAll()
+CenterRepo --> Service: centers
+Service --> Ctrl: initialData(vaccineTypes, centers)
+Ctrl --> View: showForm(initialData)
+View --> User: form displayed
+
+' --- STEP 2: User fills in the scheduling data ---
+User -> View: inserts vaccineType, center, dateTime, contactInfo
+View -> Request: «create»(snsUserId, vaccineTypeId, centerId, dateTime, contactInfo)
+Request --> View: request
+View -> Ctrl: submitScheduleData(request)
+
+Ctrl -> Service: buildPreview(request)
+Service -> VTRepo: findById(request.vaccineTypeId)
+VTRepo --> Service: vaccineType
+Service -> CenterRepo: findById(request.centerId)
+CenterRepo --> Service: center
+Service -> Preview: «create»(vaccineType, center, request.dateTime)
+Preview --> Service: preview
+Service --> Ctrl: preview
+Ctrl --> View: showPreview(preview)
+View --> User: preview displayed
+
+' --- STEP 3: User confirms the scheduling ---
+User -> View: confirms scheduling
+View -> Ctrl: confirmSchedule(request)
+Ctrl -> Service: scheduleVaccine(request)
+
+' --- STEP 4: Business rule validation & appointment creation ---
+Service -> AppContainer: findFutureAppointmentsByUserAndType(  request.snsUserId,  request.vaccineTypeId)
+AppContainer --> Service: existingAppointments
+
+Service -> AppContainer: isSlotAvailable(  request.centerId,  request.dateTime)
+AppContainer --> Service: slotAvailable
+
+Service -> Appointment: «create»(request.snsUserId, vaccineType, center, request.dateTime)
+Appointment --> Service: appointment
+
+' (Service now knows if scheduling is valid or not and has the appointment instance)
+
+alt valid data AND noConflict AND slotAvailable
+    Service -> AppContainer: save(appointment)
+    AppContainer --> Service: saved
+    Service --> Ctrl: success(appointment)
+    Ctrl --> View: showScheduleConfirmation(appointment)
+    View --> User: confirmation shown
+else invalid data OR conflict OR unavailable slot
+    Service --> Ctrl: error(errorMessage)
+    Ctrl --> View: showScheduleError(errorMessage)
+    View --> User: error shown
+end
+
+@enduml
