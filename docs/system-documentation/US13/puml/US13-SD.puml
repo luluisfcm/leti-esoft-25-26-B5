@@ -7,12 +7,10 @@ actor "DGS Administrator" as Admin
 participant ":RegisterVaccinationCenterView" as System
 participant ":RegisterVaccinationCenterController" as Ctrl
 participant "service\n:VaccinationCenterService" as Service
-participant "dto:VaccinationCenterDto" as CenterDto
 participant "repoCenters\n:VaccinationCenterRepository" as RepoCenter
 participant "repoVaccines\n:VaccineTypeRepository" as RepoVaccine
+participant "dto:VaccinationCenterDto" as CenterDto
 participant "center:VaccinationCenter" as Center
-participant "vaccine:VaccineType" as Vaccine
-participant "lstVaccines\n:List<VaccineType>" as LstVaccines
 
 activate Admin
 
@@ -21,12 +19,13 @@ System -> Ctrl: start()
 
 Ctrl -> Service: getVaccineTypes()
 Service -> RepoVaccine: getAll()
-RepoVaccine --> Service: lstVaccines
-Service --> Ctrl: lstVaccines
-Ctrl --> System: lstVaccines
+RepoVaccine --> Service: List<VaccineType>
+Service --> Ctrl: List<VaccineType>
+Ctrl --> System: List<VaccineType>
 
-System --> Admin: requests center data \n(name, address, phone, email, website,\nmaxVaccinesPerHour, openingHours, closingHours, type)
+System --> Admin: requests center data\n(name, address, phone, email, website,\nmaxVaccinesPerHour, openingHours, closingHours, type)
 System --> Admin: if Community Center, select vaccine types
+
 Admin -> System: types all requested data and selects vaccine types
 
 System --> CenterDto**: create(name, address, phone, email, website,\nmaxPerHour, opening, closing, type, vaccineTypeIds)
@@ -40,7 +39,7 @@ loop for each vaccineTypeId
 Service -> CenterDto: getVaccineTypeIds()
 CenterDto --> Service: vaccineTypeId
 Service -> RepoVaccine: getById(vaccineTypeId)
-RepoVaccine --> Service: vaccine
+RepoVaccine --> Service: VaccineType
 end
 
 note over Service, CenterDto: extracting data from DTO

@@ -6,8 +6,8 @@ hide methods
 
 ' ===================== Administrator =====================
 class DGSAdministrator {
-    + name
-    + email
+    - name
+    - email
 }
 
 ' ===================== Vaccination Centers =====================
