@@ -1,0 +1,41 @@
+@startuml
+title US30 – Domain Model View – Schedule Vaccine Administration
+
+hide circle
+skinparam classAttributeIconSize 0
+hide methods
+
+class SNSUser {
+  + snsNumber : String
+  + name : String
+  + birthDate : Date
+}
+
+class Receptionist {
+  + employeeId : String
+  + name : String
+}
+
+class VaccineType {
+  + code : String
+  + description : String
+}
+
+class VaccinationCenter {
+  + centerId : String
+  + name : String
+  + location : String
+}
+
+class VaccineAppointment {
+  + appointmentId : String
+  + dateTime : DateTime
+  + status : String
+}
+
+VaccineAppointment "0..*" -- "1" SNSUser           : forUser
+VaccineAppointment "0..*" -- "1" VaccineType       : ofType
+VaccineAppointment "0..*" -- "1" VaccinationCenter : atCenter
+VaccineAppointment "0..*" -- "0..1" Receptionist   : scheduledBy
+
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+skinparam classAttributeIconSize 0
+
+class ScheduleVaccineView {
+}
+
+class ScheduleVaccineController {
+    +createVaccineAppointment(request: ScheduleVaccineRequest): void
+    +saveCreatedVaccineAppointment(): Result
+}
+
+class SNSUser {
+    -snsNumber
+    -name
+    +getVaccineAppointmentContainer(): VaccineAppointmentContainer
+}
+
+class VaccineAppointmentContainer {
+    +create(request: ScheduleVaccineRequest): VaccineAppointment
+    +save(VaccineAppointment obj): Result
+}
+
+class VaccineAppointment {
+    -appointmentId
+    -dateTime
+    -status
+    VaccineAppointment(dateTime, status)
+}
+
+class ScheduleVaccineRequest {
+    -snsUserId
+    -vaccineTypeId
+    -centerId
+    -dateTime
+    -contactInfo
+}
+
+SNSUser "1" -right-> "1" VaccineAppointmentContainer: maintains
+VaccineAppointmentContainer "1" -right-> "0..*" VaccineAppointment: records
+
+ScheduleVaccineView ..> ScheduleVaccineController
+ScheduleVaccineController ..> SNSUser
+ScheduleVaccineController ..> VaccineAppointmentContainer
+ScheduleVaccineController ..> VaccineAppointment
+ScheduleVaccineController ..> ScheduleVaccineRequest
+
+@enduml
