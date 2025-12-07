@@ -1,0 +1,51 @@
+@startuml
+title US12 - Class Diagram
+skinparam classAttributeIconSize 0
+hide circle
+
+class ListVaccinesUI {
+  + run()
+}
+
+class ListVaccinesController {
+  ' O Controller assume a responsabilidade de agrupar
+  + getAllVaccinesGroupedByType() : Map<VaccineType, List<Vaccine>>
+}
+
+class Company {
+  - vaccineStore : VaccineStore
+  + getVaccineStore() : VaccineStore
+  + getInstance() : Company
+}
+
+class VaccineStore {
+  - vaccines : List<Vaccine>
+  ' A Store fica limpa e genérica
+  + getAll() : List<Vaccine>
+}
+
+class VaccineType {
+  - disease : String
+  - shortDescription : String
+  + getDisease() : String
+  + getDescription() : String
+}
+
+class Vaccine {
+  - commercialName : String
+  - brand : String
+  - technologyUsed : String
+  - type : VaccineType
+  + getBrand() : String
+  + getType() : VaccineType
+}
+
+ListVaccinesUI ..> ListVaccinesController
+ListVaccinesController ..> Company
+ListVaccinesController ..> VaccineStore
+
+Company "1" --> "1" VaccineStore : uses
+VaccineStore "1" o-- "*" Vaccine : stores
+Vaccine "*" --> "1" VaccineType : is of
+
+@enduml

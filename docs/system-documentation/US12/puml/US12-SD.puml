@@ -1,0 +1,71 @@
+@startuml
+title US12 - Sequence Diagram
+autonumber
+
+actor "Administrator" as Admin
+participant ":ListVaccinesUI" as UI
+participant ":ListVaccinesController" as CTRL
+participant ":Company" as COMP
+participant "store:VaccineStore" as STORE
+participant "vac:Vaccine" as VAC
+participant "type:VaccineType" as VTYPE
+
+Admin -> UI : requestListOfVaccines()
+activate UI
+
+    UI -> CTRL : getAllVaccines()
+    activate CTRL
+
+        CTRL -> COMP : getInstance()
+        activate COMP
+        COMP --> CTRL : company
+        deactivate COMP
+
+        CTRL -> COMP : getVaccineStore()
+        activate COMP
+        COMP --> CTRL : store
+        deactivate COMP
+
+        ' 1. Obter dados
+        CTRL -> STORE : getAll()
+        activate STORE
+        STORE --> CTRL : vaccineList
+        deactivate STORE
+
+        ' 2. Lógica AC12-1: Agrupar e Ordenar
+        loop for each vaccine
+            CTRL -> VAC : getType()
+            activate VAC
+            VAC --> CTRL : type
+            deactivate VAC
+
+            CTRL -> VAC : getBrand()
+            activate VAC
+            VAC --> CTRL : brand
+            deactivate VAC
+
+            CTRL -> CTRL : groupAndSort(vaccine, type, brand)
+        end
+
+    CTRL --> UI : organizedMap
+    deactivate CTRL
+
+    ' 3. Display na UI
+    loop for each group and vaccine
+        UI -> VTYPE : getDescription()
+        activate VTYPE
+        VTYPE --> UI : description
+        deactivate VTYPE
+
+        UI -> VAC : toString() / getBrand()
+        activate VAC
+        VAC --> UI : details
+        deactivate VAC
+
+        UI -> UI : show(description, details)
+    end
+
+UI --> Admin : shows list of vaccines
+deactivate UI
+
+@enduml
