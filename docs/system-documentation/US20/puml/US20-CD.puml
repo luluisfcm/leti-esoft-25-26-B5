@@ -1,0 +1,74 @@
+@startuml
+title US20 - Class Diagram (Design)
+hide circle
+skinparam classAttributeIconSize 0
+allow_mixing
+
+class RegisterSNSUserView {
+}
+
+class RegisterSNSUserController {
+    + registerSNSUser(dto: SNSUserDto): Result
+}
+
+class DGSAdministrator {
+    - name: String
+    + getSNSUserService(): SNSUserService
+}
+
+class SNSUserService {
+    + SNSUserService(repo: SNSUserRepository)
+    + register(dto: SNSUserDto): Result
+}
+
+class SNSUserDto {
+    + name: String
+    + dateOfBirth: Date
+    + sex: String
+    + postalAddress: String
+    + phone: String
+    + email: String
+    + citizenCardNumber: String
+    + snsUserNumber: String
+}
+
+interface SNSUserRepository <<interface>> {
+    + save(user: SNSUser): Result
+    + findByUniqueAttributes(phone, email, cc, sns): SNSUser
+}
+
+interface RepositoryFactory <<interface>> {
+    + getSNSUserRepository(): SNSUserRepository
+}
+
+class SNSUser {
+    - name: String
+    - dateOfBirth: Date
+    - sex: String
+    - postalAddress: String
+    - phone: String
+    - email: String
+    - citizenCardNumber: String
+    - snsUserNumber: String
+    + SNSUser(name, address, sex, phone, email, cc, sns)
+    + validate(): boolean
+}
+
+' Relações Estruturais (Iguais à tua imagem)
+RegisterSNSUserView ..> RegisterSNSUserController
+RegisterSNSUserController ..> DGSAdministrator
+RegisterSNSUserController ..> SNSUserService
+RegisterSNSUserController ..> SNSUserDto
+
+DGSAdministrator ..> SNSUserService : uses/creates
+DGSAdministrator ..> RepositoryFactory : uses
+
+SNSUserService ..> SNSUserRepository : uses
+SNSUserService ..> SNSUser : creates
+SNSUserService ..> SNSUserDto : reads
+
+RepositoryFactory ..> SNSUserRepository : creates
+
+SNSUserRepository ..> SNSUser : records
+
+@enduml
