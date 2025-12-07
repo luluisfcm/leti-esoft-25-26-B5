@@ -1,3 +1,29 @@
 project(Core)
 
-add_library(Core ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/domain/shared/Result.h ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/domain/shared/StringUtils.h ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/sources/domain/shared/Result.cpp ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/sources/domain/shared/StringUtils.cpp)
+add_library(Core ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/domain/shared/Result.h ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/domain/shared/StringUtils.h ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/sources/domain/shared/Result.cpp ../../../CLionProjects/leti-esoft-25-26-B5/ConsoleApp/sources/domain/shared/StringUtils.cpp
+    headers/domain/model/VaccineType.h
+    sources/domain/model/VaccineType.cpp
+    headers/domain/model/Vaccine.h
+    sources/domain/model/Vaccine.cpp
+    headers/domain/model/SNSUser.h
+    sources/domain/model/SNSUser.cpp
+    headers/domain/model/StaffMember.h
+    sources/domain/model/StaffMember.cpp
+    headers/domain/model/Receptionist.h
+    headers/domain/model/Nurse.h
+    headers/domain/model/DGSAdministrator.h
+    headers/domain/model/VaccinationCenter.h
+    sources/domain/model/VaccinationCenter.cpp
+    headers/domain/model/HealthcareCenter.h
+    headers/domain/model/CommunityMassVaccinationCenter.h
+    headers/domain/model/AppointmentStatus.h
+    headers/domain/model/Appointment.h
+    sources/domain/model/Appointment.cpp
+    headers/domain/model/VaccinationEvent.h
+    sources/domain/model/VaccinationEvent.cpp
+    headers/domain/model/AdverseReaction.h
+    sources/domain/model/AdverseReaction.cpp
+    headers/domain/model/VaccinationCertificate.h
+    sources/domain/model/VaccinationCertificate.cpp
+    headers/domain/model/Outbreak.h
+    sources/domain/model/Outbreak.cpp)
