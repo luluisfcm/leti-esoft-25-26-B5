@@ -1,0 +1,37 @@
+@startuml
+title US40 – Domain Model
+
+hide methods
+hide circle
+skinparam linetype ortho
+
+class VaccinationCenter {
+  name
+  postalAddress
+}
+
+class SNSUser {
+  name
+  citizenCardNumber
+}
+
+class Appointment {
+  arrivalDateTime
+  status
+}
+
+enum AppointmentStatus {
+  Scheduled
+  Arrived
+  Ready
+  InProgress
+}
+
+class Nurse {
+}
+
+VaccinationCenter "1" -- "0..*" Appointment : at >
+SNSUser "1" -- "0..*" Appointment : has >
+Nurse "1" -- "0..*" Appointment : consults >
+
+@enduml
