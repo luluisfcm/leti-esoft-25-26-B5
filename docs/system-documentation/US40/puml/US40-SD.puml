@@ -1,0 +1,50 @@
+@startuml
+title US40 - Sequence Diagram
+autonumber
+
+actor "Nurse" as Nur
+participant ":ConsultationView" as UI
+participant ":ConsultationController" as Ctrl
+participant "service\n:WaitingRoomService" as Svc
+participant "repoApp\n:AppointmentRepository" as Repo
+participant "dto:WaitingRoomDto" as DTO
+
+activate Nur
+
+Nur -> UI : asks to consult the waiting room list
+activate UI
+
+    UI -> Ctrl : getWaitingRoom(centerId)
+    activate Ctrl
+
+        Ctrl -> Svc : getWaitingList(centerId)
+        activate Svc
+
+            ' Procura agendamentos com status "Arrived"
+            Svc -> Repo : findArrivedByCenter(centerId)
+            activate Repo
+            Repo --> Svc : listAppointments
+            deactivate Repo
+
+            ' Regra de Negócio AC40-1
+            note over Svc
+                AC40-1: The list should be presented on a
+                first-come, first-served basis.
+                Svc sorts listAppointments by arrivalDateTime.
+            end note
+
+            loop for each appointment in sorted list
+                Svc -> DTO** : create(snsUserName, arrivalTime)
+            end
+
+            Svc --> Ctrl : listWaitingRoomDto
+        deactivate Svc
+
+        Ctrl --> UI : listWaitingRoomDto
+    deactivate Ctrl
+
+    UI --> Nur : displays sorted list of users in waiting room
+deactivate UI
+
+deactivate Nur
+@enduml
