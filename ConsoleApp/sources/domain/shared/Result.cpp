@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include "headers/domain/shared/Result.h"
+#include "domain/shared/Result.h"
 
 Result::Result(const int result, const wstring &message) {
     this->result = result;

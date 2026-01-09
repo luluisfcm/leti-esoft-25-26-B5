@@ -1,0 +1,20 @@
+@startuml
+title SSD – US41 Record Vaccine Administration
+
+autoactivate on
+autonumber
+
+actor "Nurse" as Nurse
+participant ":System" as System
+
+activate Nurse
+
+Nurse -> System: asks to record a vaccine administration
+System --> Nurse: requests data (SNS user number, vaccine, lot number)
+
+Nurse -> System: provides/types requested data
+System --> Nurse: shows all data and requests confirmation
+
+Nurse -> System: confirms the data
+System --> Nurse: informs operation success and assignment of user to recovery room
+@enduml
