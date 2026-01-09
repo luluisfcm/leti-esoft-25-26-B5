@@ -1,8 +1,10 @@
 #include <locale>
 #include <algorithm>
-#include "headers/domain/shared/StringUtils.h"
+#include <string>
+using std::wstring;
+#include "domain/shared/StringUtils.h"
 
-wstring StringUtils::toUpperCase(const wstring &value) {
+std::wstring StringUtils::toUpperCase(const wstring &value) {
     //  Assuming your system is already in UTF-8
     std::locale::global(std::locale(""));  // (*)
     // Otherwise you have to change to an UTF-8 locale you actually have on your platform

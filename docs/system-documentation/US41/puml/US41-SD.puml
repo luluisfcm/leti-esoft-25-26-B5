@@ -1,0 +1,62 @@
+@startuml
+title SD – US41 Record Vaccination Event
+autoactivate on
+autonumber
+
+actor "Nurse" as Nurse
+participant ":RecordVaccinationView" as UI
+participant ":RecordVaccinationController" as Ctrl
+participant ":Nurse" as NurseObj
+participant "service:VaccinationService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "vacRepo:VaccineRepository" as VacRepo
+participant "eventRepo:VaccinationEventRepository" as EventRepo
+participant "appRepo:AppointmentRepository" as AppRepo
+participant "event:VaccinationEvent" as Event
+
+activate Nurse
+
+Nurse -> UI: asks to record a new vaccination
+UI -> Ctrl: getVaccinesList()
+Ctrl -> NurseObj: getVaccinationService()
+NurseObj -> Factory: getVaccineRepository()
+Factory --> NurseObj: vacRepo
+NurseObj --> Service**: create(vacRepo, eventRepo, appRepo)
+NurseObj --> Ctrl: service
+Ctrl -> Service: getVaccines()
+Service -> VacRepo: findAll()
+VacRepo --> Service: vaccinesList
+Service --> Ctrl: vaccinesList
+Ctrl --> UI: vaccinesList
+UI --> Nurse: shows vaccines and requests data (snsUserNum, lotNumber, selectedVaccine)
+
+Nurse -> UI: types requested data
+UI -> Ctrl: recordVaccination(snsUserNum, lotNumber, vaccineBrand)
+Ctrl -> Service: createVaccinationEvent(snsUserNum, lotNumber, vaccineBrand)
+Service --> Event**: create(snsUserNum, lotNumber, vaccine)
+Service --> Ctrl: event
+Ctrl --> UI: ok
+UI --> Nurse: shows all data and requests confirmation
+
+Nurse -> UI: confirms the data
+UI -> Ctrl: saveVaccinationEvent()
+Ctrl -> Service: saveEvent(event)
+Service -> Service: validate(event)
+Service --> Service: ok
+Service -> EventRepo: save(event)
+EventRepo --> Service: ok
+
+== AC41-2: Assign to Recovery Room ==
+
+Service -> Service: assignToRecoveryRoom(snsUserNum)
+Service -> AppRepo: findActiveBySNSUser(snsUserNum)
+AppRepo --> Service: appointment
+Service -> Service: updateStatus(appointment, "InRecovery")
+Service -> AppRepo: save(appointment)
+AppRepo --> Service: ok
+Service --> Service: ok
+
+Service --> Ctrl: ok
+Ctrl --> UI: ok
+UI --> Nurse: informs operation success
+@enduml
