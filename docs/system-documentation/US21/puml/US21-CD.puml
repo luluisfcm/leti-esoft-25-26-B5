@@ -1,0 +1,86 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+skinparam classAttributeIconSize 0
+
+class ScheduleVaccineView {
+}
+
+class ScheduleVaccineController {
+    +newSchedule(): void
+    +getSNSUsers(): List<SNSUserDto>
+    +scheduleVaccine(VaccineScheduleDto dto): void
+    +saveScheduledVaccine(): Result
+}
+
+class Receptionist {
+    - name
+    +getSNSUserService(): SNSUserService
+    +getVaccineScheduleService(): VaccineScheduleService
+}
+
+class SNSUserService {
+    +getSNSUsers(): List<SNSUserDto>
+}
+
+class VaccineScheduleService {
+    +VaccineScheduleService(VaccineScheduleRepository repo, SNSUserRepository userRepo)
+    +create(VaccineScheduleDto dto): VaccineSchedule
+    +save(VaccineSchedule obj): Result
+    -validate(VaccineSchedule obj): boolean
+}
+
+interface VaccineScheduleRepository <<interface>> {
+    +save(VaccineSchedule obj): Result
+}
+
+interface SNSUserRepository <<interface>> {
+    +getById(snsUserId): SNSUser
+}
+
+interface RepositoryFactory <<interface>> {
+    +getSchedulesRepository(): VaccineScheduleRepository
+    +getUsersRepository(): SNSUserRepository
+}
+
+class VaccineSchedule {
+    - snsNumber
+    - vaccineType
+    - date
+    - time
+    - center
+    +VaccineSchedule(snsNumber, vaccineType, date, time, center, SNSUser user)
+}
+
+class VaccineScheduleDto {
+    +create(snsNumber, vaccineType, date, time, center, snsUserId)
+    +getSNSUserId()
+}
+
+class SNSUser {
+    - snsUserId
+    - name
+}
+
+' Relacionamentos baseados no template US05
+Receptionist "1" -down-> "1" RepositoryFactory: uses
+VaccineScheduleRepository "1" -right-> "0..*" VaccineSchedule: records
+
+ScheduleVaccineView ..> ScheduleVaccineController
+ScheduleVaccineController ..> Receptionist
+ScheduleVaccineController ..> VaccineScheduleService
+ScheduleVaccineController ..> SNSUserService
+ScheduleVaccineController ..> VaccineScheduleDto
+
+VaccineScheduleService ..> VaccineScheduleRepository
+VaccineScheduleService ..> SNSUserRepository
+VaccineScheduleService ..> VaccineSchedule
+VaccineScheduleService ..> VaccineScheduleDto
+
+Receptionist -> VaccineScheduleService: adopts
+RepositoryFactory .right.> VaccineScheduleRepository
+RepositoryFactory .right.> SNSUserRepository
+
+VaccineSchedule "1" --> "1" SNSUser: for
+@enduml

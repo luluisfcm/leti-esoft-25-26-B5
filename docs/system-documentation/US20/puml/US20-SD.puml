@@ -1,85 +1,53 @@
 @startuml
-title US20 - Register SNS User (SD)
+'https://plantuml.com/sequence-diagram
+autoactivate on
 autonumber
 
-actor "Receptionist" as Rec
-participant ":RegisterSNSUserView" as UI
+actor "Receptionist" as User
+participant ":RegisterSNSUserView" as System
 participant ":RegisterSNSUserController" as Ctrl
-participant "service\n:SNSUserService" as Svc
-participant "dto:SNSUserDto" as DTO
-participant "repoUsers\n:SNSUserRepository" as Repo
-participant "user:SNSUser" as Dom
+participant ":Receptionist" as Receptionist
+participant "service:SNSUserService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:SNSUserRepository" as Repo
+participant "snsUser:SNSUser" as SNSUser
 
-activate Rec
+activate User
 
-Rec -> UI : asks to register a new SNS User
-activate UI
+User -> System: asks to register a new SNS user
+System --> User: requests data (name, address, sex, phone, e-mail, birth, snsNumber, ccNumber)
 
-UI -> Ctrl : start()
-activate Ctrl
-Ctrl --> UI : ready
-deactivate Ctrl
+User -> System: types requested data
+'Nota: Não usamos DTO, passamos os atributos diretamente
+System -> Ctrl: registerSNSUser(name, address, sex, phone, e-mail, birth, snsNumber, ccNumber)
 
-UI --> Rec : requests user data (name, address, sex, phone, email,\nbirthDate, citizenCard, snsUserNumber)
-deactivate UI
+'Aplicação do Repository & Service Pattern com Abstract Factory
+Ctrl -> Receptionist: getSNSUserService()
+Receptionist -> Factory : getSNSUserRepository()
+Factory --> Receptionist: repo
+Receptionist --> Service**: create(repo)
+Receptionist --> Ctrl: service
 
-Rec -> UI : types requested data
-activate UI
+'Criação da entidade SNSUser
+Ctrl -> Service: create(name, address, sex, phone, e-mail, birth, snsNumber, ccNumber)
+Service --> SNSUser**: create(name, address, sex, phone, e-mail, birth, snsNumber, ccNumber)
+Service --> Ctrl: snsUser
 
-    note right of UI
-        AC20-2: Sex is optional.
-        Other fields are required.
-        UI collects data.
-    end note
+Ctrl --> System: ok
+System --> User: shows all data and requests confirmation
 
-    UI -> DTO** : create(name, address, sex, phone, email,\nbirthDate, citizenCard, snsUserNumber)
+User -> System: confirms the data
+System -> Ctrl: saveRegisteredSNSUser()
 
-    UI -> Ctrl : registerSNSUser(dto)
-    activate Ctrl
+'Separação de responsabilidades: Service valida, Repository guarda
+Ctrl -> Service: addOrUpdate(snsUser)
+Service -> Service : validate(snsUser)
+note right: Validação de unicidade (AC20-3) e formatos (AC20-1)
+Service --> Service : ok
 
-        Ctrl -> Svc : register(dto)
-        activate Svc
-
-            note over Svc, DTO
-                extracting data from DTO
-            end note
-
-            ' AC20-3: Uniqueness Check
-            group Verifying Uniqueness (AC20-3)
-                Svc -> Repo : existsUser(phone, email, citizenCard, snsUserNumber)
-                activate Repo
-                Repo --> Svc : false (does not exist)
-                deactivate Repo
-            end
-
-            ' Creating the Domain Object
-            Svc -> Dom** : create(name, address, sex, phone, email,\nbirthDate, citizenCard, snsUserNumber)
-
-            ' Validating Business Rules (AC20-1 & AC20-2)
-            Svc -> Dom : validate()
-            activate Dom
-                note right of Dom
-                    Validates required fields.
-                    Validates PT format for
-                    Phone & Citizen Card (AC20-1).
-                end note
-            Dom --> Svc : ok
-            deactivate Dom
-
-            ' Persistence
-            Svc -> Repo : save(user)
-            activate Repo
-            Repo --> Svc : ok
-            deactivate Repo
-
-        Svc --> Ctrl : ok
-        deactivate Svc
-
-    Ctrl --> UI : ok
-    deactivate Ctrl
-
-UI --> Rec : informs operation success
-deactivate UI
-
-deactivate Rec
+Service -> Repo: save(snsUser)
+Repo --> Service : ok
+Service --> Ctrl: ok
+Ctrl --> System: ok
+System --> User: informs operation success
 @enduml

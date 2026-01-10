@@ -1,0 +1,73 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autoactivate on
+autonumber
+
+actor "Receptionist" as Actor
+participant ":ScheduleVaccineView" as System
+participant ":ScheduleVaccineController" as Ctrl
+participant ":Receptionist" as Role
+participant "srvUsers:\nSNSUserService" as SrvUsers
+participant "service:VaccineScheduleService" as Service
+participant "dto:VaccineScheduleDto" as ScheduleDto
+participant "factory\n:RepositoryFactory" as Factory
+participant "repoSchedules\n:VaccineScheduleRepository" as RepoSchedule
+participant "repoUsers\n:SNSUserRepository" as RepoUsers
+participant "schedule:VaccineSchedule" as Schedule
+participant "user:SNSUser" as SNSUser
+participant "lstUsersDto\n:List<SNSUserDto>" as LstUsersDto
+
+activate Actor
+
+Actor -> System: asks to schedule a new vaccine administration
+System -> Ctrl: newSchedule()
+
+
+Ctrl -> Role: getSNSUserService()
+Role --> Ctrl: srvUsers
+
+Ctrl -> Role: getVaccineScheduleService()
+Role -> Factory : getSchedulesRepository()
+Factory --> Role: repoSchedules
+Role -> Factory : getUsersRepository()
+Factory --> Role: repoUsers
+Role --> Service**: create(repoSchedules, repoUsers)
+Role --> Ctrl: service
+
+Ctrl --> System:
+System --> Actor: requests data (snsNumber, vaccineType, date, time, center)
+
+Actor -> System: types requested data
+System -> Ctrl: getSNSUsers()
+
+Ctrl -> SrvUsers : getSNSUsers()
+SrvUsers --> Ctrl: lstUsersDto
+Ctrl--> System: lstUsersDto
+System --> Actor: shows existing SNS users (as DTOs) and ask to select one
+
+Actor -> System: select the intended SNS user
+System --> ScheduleDto**: create(snsNumber, vaccineType, date, time, center, snsUserId)
+System -> Ctrl: scheduleVaccine(dto)
+
+Ctrl -> Service: create(dto)
+Service -> ScheduleDto: getSNSUserId()
+ScheduleDto --> Service: snsUserId
+Service -> RepoUsers: getById(snsUserId)
+RepoUsers --> Service : user
+note over Service, ScheduleDto: extracting more data from the dto
+Service --> Schedule**: create(snsNumber, vaccineType, date, time, center, **user**)
+Service --> Ctrl: schedule
+Ctrl --> System: ok
+System --> Actor: shows all data and requests confirmation
+
+Actor -> System: confirms the data
+System -> Ctrl: saveScheduledVaccine()
+Ctrl -> Service: save(schedule)
+Service -> Service : validate(schedule)
+Service --> Service : ok
+Service -> RepoSchedule: save(schedule)
+RepoSchedule --> Service : ok
+Service --> Ctrl: ok
+Ctrl --> System: ok
+System --> Actor: informs operation success
+@enduml
