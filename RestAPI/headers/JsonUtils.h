@@ -46,14 +46,24 @@ inline std::string jsonEscape(const std::string &s) {
     out.reserve(s.size());
     for (char c : s) {
         switch (c) {
-            case '"': out += "\\\""; break;
+            case '\"': out += "\\\""; break;
             case '\\': out += "\\\\"; break;
-            case '\n': out += "\\n"; break;
-            case '\r': out += "\\r"; break;
-            case '\t': out += "\\t"; break;
-            default: out += c; break;
+            case '\b': out += "\\b";  break;
+            case '\f': out += "\\f";  break;
+            case '\n': out += "\\n";  break;
+            case '\r': out += "\\r";  break;
+            case '\t': out += "\\t";  break;
+            default:
+                if (static_cast<unsigned char>(c) < 0x20) {
+                    // encode as \u00XX
+                    const char *hex = "0123456789ABCDEF";
+                    out += "\\u00";
+                    out += hex[(c >> 4) & 0xF];
+                    out += hex[c & 0xF];
+                } else {
+                    out += c;
+                }
         }
     }
     return out;
 }
-

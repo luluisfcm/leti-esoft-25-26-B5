@@ -1,35 +1,30 @@
 @startuml
-title US12 - Domain Model View
-hide methods
+title MD – US12 List Vaccines
+
 hide circle
+hide methods
 skinparam classAttributeIconSize 0
 
-' ===================== Staff =====================
-abstract StaffMember {
-  + name : String
-  + postalAddress : String
-  + phone : String
-  + email : String
+' ===================== Classes =====================
+
+class DGSAdministrator {
+  - name
 }
 
-class DGSAdministrator
-DGSAdministrator --|> StaffMember
-
-' ===================== Vaccines =====================
 class VaccineType {
-  + disease : String
-  + shortDescription : String
+  - disease
+  - shortDescription
 }
 
 class Vaccine {
-  + commercialName : String
-  + brand : String
-  + technologyUsed : String
+  - commercialName
+  - brand
+  - technologyUsed
 }
 
-' ===================== Relations =====================
-VaccineType "1" -- "1..*" Vaccine : has brands of >
-DGSAdministrator "1" -- "*" VaccineType : manages >
-DGSAdministrator "1" -- "*" Vaccine : manages >
+' ===================== Associações =====================
+
+DGSAdministrator "1" -- "0..*" Vaccine : consults >
+Vaccine "*" -- "1" VaccineType : is of >
 
 @enduml

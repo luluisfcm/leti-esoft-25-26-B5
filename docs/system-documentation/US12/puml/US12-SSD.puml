@@ -1,16 +1,15 @@
 @startuml
-title US12 - System Sequence Diagram
+'https://plantuml.com/sequence-diagram
+
+autoactivate on
 autonumber
 
-actor "DGS Administrator" as ADM
-participant ":System" as SYS
+actor "Administrator" as Admin
+participant ":System" as System
 
-activate ADM
-ADM -> SYS : asks to list all vaccines
-activate SYS
+activate Admin
 
-SYS --> ADM : displays the list of vaccines (grouped by type, sorted by brand)
-deactivate SYS
-deactivate ADM
+Admin -> System: asks to list all vaccines
+System --> Admin: shows vaccines list grouped by type and ordered by brand
 
 @enduml
