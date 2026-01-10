@@ -1,19 +1,15 @@
 #pragma once
-
-#include <string>
-#include "VaccineService.h"
-//#include "VaccineTypeService.h"
+#include "http/RestClient.h"
 
 class VaccineUI {
-    VaccineService &vaccSvc;
-    VaccineTypeService &typeSvc;
+    RestClient &client;
 
 public:
-    VaccineUI(VaccineService &vaccSvc, VaccineTypeService &typeSvc);
+    explicit VaccineUI(RestClient &client);
 
-    void list();     // GET all
-    void view();     // GET by code
-    void create();   // POST
-    void update();   // PUT
-    void remove();   // DELETE
+    void list();
+    void view();
+    void create();
+    void update();
+    void remove();
 };

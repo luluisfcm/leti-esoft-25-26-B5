@@ -6,17 +6,31 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(ConsoleApp
         ConsoleApp.cpp
-
-        # shared utils
         sources/domain/shared/Result.cpp
         sources/domain/shared/StringUtils.cpp
-
-        # UI (vais acrescentar depois)
+        sources/domain/http/RestClient.cpp
         sources/domain/ui/VaccineUI.cpp
+        sources/domain/ui/VaccineTypeUI.cpp
+
 )
+
+# Resolve o problema do CreateFile2 no Windows headers (MinGW)
+target_compile_definitions(ConsoleApp PRIVATE
+        CPPHTTPLIB_NO_MMAP
+        _WIN32_WINNT=0x0602
+        WINVER=0x0602
+)
+
+# Diretório raiz do repo (um nível acima de ConsoleApp/)
+get_filename_component(REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
 target_include_directories(ConsoleApp PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/domain
+        "${CMAKE_CURRENT_LIST_DIR}/domain"
+        "${REPO_ROOT}/RestAPI/thirdparty"
+        "${REPO_ROOT}/RestAPI/headers"
 )
 
-target_link_libraries(ConsoleApp Core)
+target_link_libraries(ConsoleApp PRIVATE
+        Core
+        $<$<BOOL:${WIN32}>:ws2_32>
+)
