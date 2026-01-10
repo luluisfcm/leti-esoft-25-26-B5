@@ -1,0 +1,74 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autoactivate on
+autonumber
+
+title US40 - SD RestAPI
+
+participant ":HTTPClient" as HTTPClient
+participant "handler:RouteHandler" as System
+participant ":WaitingRoomController" as Ctrl
+participant ":Nurse" as Nurse
+participant "service:CheckInService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:CheckInRepository" as Repo
+participant "checkIn:CheckIn" as CheckIn
+participant "user:SNSUser" as User
+participant "WaitingRoomMapper" as Mapper
+participant "jsonObj:JSON" as Json
+participant "checkInJson:JSON" as JsonCI
+participant "result:HttpResult" as Result
+
+activate HTTPClient
+
+HTTPClient -> System: GET/waitingroom/{centerId}
+note over System: after doing some stuff
+System -> Ctrl: getWaitingRoomList(centerId)
+
+' Domain Logic Integration
+Ctrl -> Nurse: getCheckInService()
+Nurse -> Factory : getCheckInRepository()
+Factory --> Nurse: repo
+Nurse --> Service**: create(repo)
+Nurse --> Ctrl: service
+
+Ctrl -> Service: getWaitingRoomList(centerId)
+Service -> Repo: findByCenter(centerId)
+Repo --> Service: list
+Service --> Ctrl: list
+
+' Mapping Domain to JSON
+Ctrl -> Mapper: toJson(list)
+Mapper --> Json**: create()
+loop for each 'checkIn' in 'list'
+    Mapper -> Mapper: toJson(checkIn)
+
+    Mapper -> CheckIn: getSNSUser()
+    CheckIn --> Mapper: user
+
+    Mapper -> User: getName()
+    User --> Mapper: name
+
+    Mapper -> User: getSnsUserNumber()
+    User --> Mapper: snsNumber
+
+    Mapper --> JsonCI**: create()
+    Mapper -> JsonCI: setUserName(name)
+    JsonCI --> Mapper
+    Mapper -> JsonCI: setSnsNumber(snsNumber)
+    JsonCI --> Mapper
+
+    Mapper --> Mapper: checkInJson
+    Mapper -> Json: add(checkInJson)
+    Json --> Mapper:
+end loop
+
+Mapper --> Ctrl: jsonObj
+Ctrl --> Result**: create(200, jsonObj)
+Ctrl --> System: result
+System -> System: setHttpResult(resp, result)
+System --> System:
+System --> HTTPClient: resp
+
+@enduml

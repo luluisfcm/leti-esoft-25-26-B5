@@ -1,66 +1,55 @@
 @startuml
-title US40 - Class Diagram
 hide circle
+title US40 - CD
 skinparam classAttributeIconSize 0
 
-class ConsultationView {
+class ConsultWaitingRoomView {
 }
 
-class ConsultationController {
-    + getWaitingRoom(centerId: String): List<WaitingRoomDto>
+class ConsultWaitingRoomController {
+    +getWaitingRoomList(center): List<CheckIn>
 }
 
 class Nurse {
-    - name: String
-    + getWaitingRoomService(): WaitingRoomService
+    - email
+    +getCheckInService(): CheckInService
 }
 
-class WaitingRoomService {
-    + WaitingRoomService(repo: AppointmentRepository)
-    + getWaitingList(centerId: String): List<WaitingRoomDto>
+class CheckInService {
+    +CheckInService(CheckInRepository checkInRepo)
+    +getWaitingRoomList(center): List<CheckIn>
 }
 
-class WaitingRoomDto {
-    + snsUserName: String
-    + arrivalTime: DateTime
-}
-
-interface AppointmentRepository <<interface>> {
-    + findArrivedByCenter(centerId: String): List<Appointment>
+interface CheckInRepository <<interface>> {
+    +findByCenter(center): List<CheckIn>
 }
 
 interface RepositoryFactory <<interface>> {
-    + getAppointmentRepository(): AppointmentRepository
+    +getCheckInRepository(): CheckInRepository
 }
 
-class Appointment {
-    - arrivalDateTime: DateTime
-    - status: String
-    + getSNSUser(): SNSUser
+class CheckIn {
+    - dateTime
+    +getSNSUser(): SNSUser
+    +getDateTime(): DateTime
 }
 
 class SNSUser {
-    - name: String
-    - citizenCardNumber: String
+    - snsUserNumber
+    - name
 }
 
-' Relações baseadas no teu exemplo
-ConsultationView ..> ConsultationController
-ConsultationController ..> Nurse
-ConsultationController ..> WaitingRoomService
-ConsultationController ..> WaitingRoomDto
+Nurse "1" -down-> "1" RepositoryFactory: uses
+CheckInRepository "1" -right-> "0..*" CheckIn: records
+CheckIn "1" -down-> "1" SNSUser: associated to
 
-Nurse ..> WaitingRoomService : uses
-Nurse ..> RepositoryFactory : uses
+ConsultWaitingRoomView ..> ConsultWaitingRoomController
+ConsultWaitingRoomView ..> CheckIn
+ConsultWaitingRoomController ..> Nurse
+ConsultWaitingRoomController ..> CheckInService
+CheckInService ..> CheckInRepository
 
-WaitingRoomService ..> AppointmentRepository : uses
-WaitingRoomService ..> WaitingRoomDto : creates
-WaitingRoomService ..> Appointment : reads
-
-RepositoryFactory ..> AppointmentRepository : creates
-
-AppointmentRepository ..> Appointment : records
-Appointment --> SNSUser : relates to
-
+Nurse -> CheckInService: adopts
+RepositoryFactory .right.> CheckInRepository
 
 @enduml

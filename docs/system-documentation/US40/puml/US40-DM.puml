@@ -1,37 +1,37 @@
 @startuml
-title US40 – Domain Model
-
-hide methods
+skinparam classAttributeIconSize 0
 hide circle
-skinparam linetype ortho
+hide methods
 
-class VaccinationCenter {
-  name
-  postalAddress
-}
-
-class SNSUser {
-  name
-  citizenCardNumber
-}
-
-class Appointment {
-  arrivalDateTime
-  status
-}
-
-enum AppointmentStatus {
-  Scheduled
-  Arrived
-  Ready
-  InProgress
-}
+title US40 - DM
 
 class Nurse {
 }
 
-VaccinationCenter "1" -- "0..*" Appointment : at >
-SNSUser "1" -- "0..*" Appointment : has >
-Nurse "1" -- "0..*" Appointment : consults >
+class VaccinationCenter {
+    - name
+}
+
+class WaitingRoom {
+}
+
+class CheckIn {
+    - dateTime
+}
+
+class Appointment {
+}
+
+class SNSUser {
+    - snsUserNumber
+    - name
+}
+
+' Relacionamentos baseados no modelo global
+Nurse "0..*" -- "1" VaccinationCenter : works at >
+VaccinationCenter "1" -- "1" WaitingRoom : has >
+WaitingRoom "1" -- "0..*" CheckIn : contains >
+CheckIn "1" -- "1" Appointment : generated from >
+Appointment "1" -- "1" SNSUser : for >
 
 @enduml
