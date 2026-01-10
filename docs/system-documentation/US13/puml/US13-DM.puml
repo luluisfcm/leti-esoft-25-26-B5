@@ -1,17 +1,14 @@
 @startuml
-' https://plantuml.com/class-diagram
 title US13 - Domain Model
-skinparam classAttributeIconSize 0
 hide circle
 hide methods
+skinparam classAttributeIconSize 0
 
-' ===================== Administrator =====================
 class DGSAdministrator {
     - name
     - email
 }
 
-' ===================== Vaccination Centers =====================
 abstract class VaccinationCenter {
     - name
     - postalAddress
@@ -29,13 +26,11 @@ class CommunityMassVaccinationCenter
 VaccinationCenter <|-- HealthcareCenter
 VaccinationCenter <|-- CommunityMassVaccinationCenter
 
-' ===================== Vaccine Type =====================
 class VaccineType {
     - disease
     - shortDescription
 }
 
-' ===================== Associations =====================
 
 DGSAdministrator "1" -- "0..*" VaccinationCenter : registers >
 
