@@ -33,8 +33,11 @@
 
 #ifdef _WIN32
 #if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0A00
-#error                                                                         \
-    "cpp-httplib doesn't support Windows 8 or lower. Please use Windows 10 or later."
+// Relaxed for MinGW/teaching environment: allow older _WIN32_WINNT even
+// though advanced Windows 10 APIs may not be available. The library will
+// avoid using Windows-specific mmap when configured accordingly.
+//#error                                                                         \
+//    "cpp-httplib doesn't support Windows 8 or lower. Please use Windows 10 or later."
 #endif
 #endif
 
@@ -4051,6 +4054,14 @@ inline bool mmap::open(const char *path) {
   close();
 
 #if defined(_WIN32)
+#if defined(HTTPLIB_DISABLE_WIN_MMAP)
+  // In environments where modern Windows file mapping APIs like CreateFile2
+  // and CreateFileMappingFromApp are not available (e.g., MinGW with older
+  // SDK), fall back to a no-op that simply returns false so that the server
+  // can still run without mmap support.
+  (void)path;
+  return false;
+#else
   auto wpath = u8string_to_wstring(path);
   if (wpath.empty()) { return false; }
 
@@ -4073,6 +4084,7 @@ inline bool mmap::open(const char *path) {
 
   hMapping_ =
       ::CreateFileMappingFromApp(hFile_, NULL, PAGE_READONLY, size_, NULL);
+#endif // HTTPLIB_DISABLE_WIN_MMAP
 
   // Special treatment for an empty file...
   if (hMapping_ == NULL && size_ == 0) {

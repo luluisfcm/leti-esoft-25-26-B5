@@ -1,73 +1,67 @@
 {
   "info": {
-    "name": "Vaccine API",
-    "_postman_id": "00000000-0000-0000-0000-000000000001",
-    "description": "CRUD for vaccines and vaccine types",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "name": "Vaccine API (minimal)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "vaccine-api-minimal"
   },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api/v1" }
+  ],
   "item": [
     {
-      "name": "Get Vaccine Types",
+      "name": "Vaccine Types - List",
       "request": {
         "method": "GET",
         "header": [],
-        "url": {
-          "raw": "http://localhost:8080/api/v1/vaccine-types",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["api", "v1", "vaccine-types"]
-        }
+        "url": "{{baseUrl}}/vaccine-types"
       }
     },
     {
-      "name": "Create Vaccine Type",
+      "name": "Vaccine Types - Create",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [{ "key":"Content-Type", "value":"application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"id\": 0,\n  \"code\": \"COVID19\",\n  \"description\": \"COVID-19 vaccines\"\n}"
+          "raw": "{ \"name\": \"mRNA\", \"description\": \"mRNA vaccines\" }"
         },
-        "url": {
-          "raw": "http://localhost:8080/api/v1/vaccine-types",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["api", "v1", "vaccine-types"]
-        }
+        "url": "{{baseUrl}}/vaccine-types"
       }
     },
     {
-      "name": "Get Vaccines",
+      "name": "Vaccine Types - Get by ID",
       "request": {
         "method": "GET",
         "header": [],
-        "url": {
-          "raw": "http://localhost:8080/api/v1/vaccines",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["api", "v1", "vaccines"]
-        }
+        "url": "{{baseUrl}}/vaccine-types/1"
       }
     },
     {
-      "name": "Create Vaccine",
+      "name": "Vaccines - List",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/vaccines"
+      }
+    },
+    {
+      "name": "Vaccines - Create",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [{ "key":"Content-Type", "value":"application/json" }],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"id\": 0,\n  \"name\": \"Comirnaty\",\n  \"typeId\": 1,\n  \"manufacturer\": \"Pfizer/BioNTech\"\n}"
+          "raw": "{ \"typeId\": 1, \"manufacturer\": \"Acme\", \"batch\": \"B-001\", \"date\": \"2025-01-01\" }"
         },
-        "url": {
-          "raw": "http://localhost:8080/api/v1/vaccines",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["api", "v1", "vaccines"]
-        }
+        "url": "{{baseUrl}}/vaccines"
+      }
+    },
+    {
+      "name": "Vaccines - Get by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/vaccines/1"
       }
     }
   ]

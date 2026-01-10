@@ -1,51 +1,64 @@
 @startuml
-title US12 - Class Diagram
-skinparam classAttributeIconSize 0
-hide circle
+title CD – US12 List All Vaccines
 
-class ListVaccinesUI {
-  + run()
+hide circle
+skinparam classAttributeIconSize 0
+
+' ===================== UI & Controller =====================
+class ListVaccinesView {
 }
 
 class ListVaccinesController {
-  ' O Controller assume a responsabilidade de agrupar
-  + getAllVaccinesGroupedByType() : Map<VaccineType, List<Vaccine>>
+    +getAllGrouped(): List<Vaccine>
 }
 
-class Company {
-  - vaccineStore : VaccineStore
-  + getVaccineStore() : VaccineStore
-  + getInstance() : Company
+' ===================== Domain / Service =====================
+class Administrator {
+    - name
+    +getVaccineService(): VaccineService
 }
 
-class VaccineStore {
-  - vaccines : List<Vaccine>
-  ' A Store fica limpa e genérica
-  + getAll() : List<Vaccine>
+class VaccineService {
+    +VaccineService(VaccineRepository vacRepo)
+    +getAllGroupedByBrand(): List<Vaccine>
+}
+
+' ===================== Repositories =====================
+interface VaccineRepository <<interface>> {
+    +findAll(): List<Vaccine>
+}
+
+interface RepositoryFactory <<interface>> {
+    +getVaccineRepository(): VaccineRepository
+}
+
+' ===================== Entities =====================
+class Vaccine {
+    - commercialName
+    - brand
+    - technologyUsed
+    +getBrand(): string
+    +getType(): VaccineType
 }
 
 class VaccineType {
-  - disease : String
-  - shortDescription : String
-  + getDisease() : String
-  + getDescription() : String
+    - disease
+    - shortDescription
+    +getDisease(): string
 }
 
-class Vaccine {
-  - commercialName : String
-  - brand : String
-  - technologyUsed : String
-  - type : VaccineType
-  + getBrand() : String
-  + getType() : VaccineType
-}
+' ===================== Associations =====================
+Administrator "1" -down-> "1" RepositoryFactory: uses
+VaccineRepository "1" -right-> "0..*" Vaccine: records
+Vaccine "*" -down-> "1" VaccineType: is of
 
-ListVaccinesUI ..> ListVaccinesController
-ListVaccinesController ..> Company
-ListVaccinesController ..> VaccineStore
+ListVaccinesView ..> ListVaccinesController
+ListVaccinesView ..> Vaccine
+ListVaccinesController ..> Administrator
+ListVaccinesController ..> VaccineService
+VaccineService ..> VaccineRepository
 
-Company "1" --> "1" VaccineStore : uses
-VaccineStore "1" o-- "*" Vaccine : stores
-Vaccine "*" --> "1" VaccineType : is of
+Administrator -> VaccineService: adopts
+RepositoryFactory .right.> VaccineRepository
 
 @enduml

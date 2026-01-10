@@ -337,6 +337,9 @@ RestAPI_BINARY_DIR:STATIC=C:/Users/luis/Dev/leti-esoft-25-26-B5/cmake-build-debu
 //Value Computed by CMake
 RestAPI_IS_TOP_LEVEL:STATIC=OFF
 
+//Dependencies for the target
+RestAPI_Lib_LIB_DEPENDS:STATIC=general;ws2_32;
+
 //Value Computed by CMake
 RestAPI_SOURCE_DIR:STATIC=C:/Users/luis/Dev/leti-esoft-25-26-B5/RestAPI
 

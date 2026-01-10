@@ -1,71 +1,46 @@
 @startuml
-title US12 - Sequence Diagram
+title SD – US12 List All Vaccines
+autoactivate on
 autonumber
 
-actor "Administrator" as Admin
-participant ":ListVaccinesUI" as UI
-participant ":ListVaccinesController" as CTRL
-participant ":Company" as COMP
-participant "store:VaccineStore" as STORE
-participant "vac:Vaccine" as VAC
-participant "type:VaccineType" as VTYPE
+actor "Administrator" as User
+participant ":ListVaccinesView" as System
+participant ":ListVaccinesController" as Ctrl
+participant ":Administrator" as Admin
+participant "service:VaccineService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:VaccineRepository" as Repo
+participant "list:List<Vaccine>" as List
+participant "vac:Vaccine" as Vac
+participant "type:VaccineType" as Type
 
-Admin -> UI : requestListOfVaccines()
-activate UI
+activate User
 
-    UI -> CTRL : getAllVaccines()
-    activate CTRL
+User -> System: asks to list all vaccines
+System -> Ctrl: getAllGrouped()
+Ctrl -> Admin: getVaccineService()
+Admin -> Factory : getVaccineRepository()
+Factory --> Admin: repo
+Admin --> Service**: create(repo)
+Admin --> Ctrl: service
 
-        CTRL -> COMP : getInstance()
-        activate COMP
-        COMP --> CTRL : company
-        deactivate COMP
+Ctrl -> Service: getAllGroupedByBrand()
+Service -> Repo: findAll()
+Repo --> Service: list
+note right: Service sorts and groups list \nby Type and Brand (AC12-1)
+Service --> Ctrl: list
+Ctrl --> System: list
 
-        CTRL -> COMP : getVaccineStore()
-        activate COMP
-        COMP --> CTRL : store
-        deactivate COMP
-
-        ' 1. Obter dados
-        CTRL -> STORE : getAll()
-        activate STORE
-        STORE --> CTRL : vaccineList
-        deactivate STORE
-
-        ' 2. Lógica AC12-1: Agrupar e Ordenar
-        loop for each vaccine
-            CTRL -> VAC : getType()
-            activate VAC
-            VAC --> CTRL : type
-            deactivate VAC
-
-            CTRL -> VAC : getBrand()
-            activate VAC
-            VAC --> CTRL : brand
-            deactivate VAC
-
-            CTRL -> CTRL : groupAndSort(vaccine, type, brand)
-        end
-
-    CTRL --> UI : organizedMap
-    deactivate CTRL
-
-    ' 3. Display na UI
-    loop for each group and vaccine
-        UI -> VTYPE : getDescription()
-        activate VTYPE
-        VTYPE --> UI : description
-        deactivate VTYPE
-
-        UI -> VAC : toString() / getBrand()
-        activate VAC
-        VAC --> UI : details
-        deactivate VAC
-
-        UI -> UI : show(description, details)
-    end
-
-UI --> Admin : shows list of vaccines
-deactivate UI
+loop for each 'vac' in 'list'
+    System -> Vac: getBrand()
+    Vac --> System: brand
+    System -> Vac: getCommercialName()
+    Vac --> System: commercialName
+    System -> Vac: getType()
+    Vac -> Type: getDisease()
+    Type --> Vac: disease
+    Vac --> System: disease
+    System --> User: shows disease, brand and commercial name
+end loop
 
 @enduml
