@@ -1,0 +1,88 @@
+{
+  "info": {
+    "name": "Vaccines + VaccineTypes CRUD",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080"},
+    {"key": "token", "value": "Bearer demo-token"}
+  ],
+  "item": [
+    {
+      "name": "VaccineTypes - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "{{token}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "url": {"raw": "{{baseUrl}}/vaccine-types", "host": ["{{baseUrl}}"], "path": ["vaccine-types"]},
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"COVID\",\n  \"disease\": \"COVID-19\",\n  \"shortDescription\": \"SARS-CoV-2 vaccines\"\n}"
+        }
+      }
+    },
+    {
+      "name": "VaccineTypes - List",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "{{token}}"}],
+        "url": {"raw": "{{baseUrl}}/vaccine-types", "host": ["{{baseUrl}}"], "path": ["vaccine-types"]}
+      }
+    },
+    {
+      "name": "Vaccines - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "{{token}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "url": {"raw": "{{baseUrl}}/vaccines", "host": ["{{baseUrl}}"], "path": ["vaccines"]},
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"PFZ-C19\",\n  \"commercialName\": \"Comirnaty\",\n  \"brand\": \"Pfizer\",\n  \"technologyUsed\": \"mRNA\",\n  \"vaccineTypeCode\": \"COVID\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Vaccines - List",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "{{token}}"}],
+        "url": {"raw": "{{baseUrl}}/vaccines", "host": ["{{baseUrl}}"], "path": ["vaccines"]}
+      }
+    },
+    {
+      "name": "Vaccines - List grouped (US12)",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "{{token}}"}],
+        "url": {
+          "raw": "{{baseUrl}}/vaccines?grouped=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["vaccines"],
+          "query": [{"key": "grouped", "value": "true"}]
+        }
+      }
+    },
+    {
+      "name": "Vaccines - Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [{"key": "Authorization", "value": "{{token}}"}],
+        "url": {"raw": "{{baseUrl}}/vaccines/PFZ-C19", "host": ["{{baseUrl}}"], "path": ["vaccines", "PFZ-C19"]}
+      }
+    },
+    {
+      "name": "VaccineTypes - Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [{"key": "Authorization", "value": "{{token}}"}],
+        "url": {"raw": "{{baseUrl}}/vaccine-types/COVID", "host": ["{{baseUrl}}"], "path": ["vaccine-types", "COVID"]}
+      }
+    }
+  ]
+}
+

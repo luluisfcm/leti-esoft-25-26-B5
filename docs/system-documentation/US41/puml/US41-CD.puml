@@ -1,0 +1,106 @@
+@startuml
+title CD – US41 Record Vaccine Administration
+
+hide circle
+skinparam classAttributeIconSize 0
+
+' ===================== UI & Controller =====================
+class RecordVaccinationView {
+}
+
+class RecordVaccinationController {
+    + getVaccinesList(): List<Vaccine>
+    + recordVaccination(snsUserNum, lotNumber, vaccineBrand): void
+    + saveVaccinationEvent(): Result
+}
+
+' ===================== Actor & Service =====================
+class Nurse {
+    - name
+    + getVaccinationService(): VaccinationService
+}
+
+class VaccinationService {
+    + VaccinationService(VaccinationEventRepository eventRepo, AppointmentRepository appRepo, VaccineRepository vacRepo)
+    + getVaccines(): List<Vaccine>
+    + createVaccinationEvent(snsUserNum, lotNumber, vaccineBrand): VaccinationEvent
+    + assignToRecoveryRoom(snsUserNum): Result
+    + saveEvent(VaccinationEvent event): Result
+}
+
+' ===================== Interfaces (Persistence) =====================
+interface VaccinationEventRepository <<interface>> {
+    + save(VaccinationEvent event): Result
+}
+
+interface AppointmentRepository <<interface>> {
+    + findActiveBySNSUser(snsUserNum): Appointment
+    + save(Appointment app): Result
+}
+
+interface VaccineRepository <<interface>> {
+    + findAll(): List<Vaccine>
+}
+
+interface RepositoryFactory <<interface>> {
+    + getVaccinationEventRepository(): VaccinationEventRepository
+    + getAppointmentRepository(): AppointmentRepository
+    + getVaccineRepository(): VaccineRepository
+}
+
+' ===================== Implementations (Persistence) =====================
+class VaccinationEventMemoryRepository {
+    + save(VaccinationEvent event): Result
+}
+
+class MemoryRepositoryFactory {
+    + getVaccinationEventRepository(): VaccinationEventRepository
+    + getAppointmentRepository(): AppointmentRepository
+    + getVaccineRepository(): VaccineRepository
+}
+
+' ===================== Entities =====================
+class VaccinationEvent {
+    - lotNumber
+    - administrationDateTime
+    + VaccinationEvent(snsUserNum, lotNumber, vaccine)
+}
+
+class Appointment {
+    - status
+    + setStatus(status): void
+}
+
+class Vaccine {
+    - commercialName
+    - brand
+}
+
+' ===================== Relationships =====================
+' UI and Logic
+RecordVaccinationView ..> RecordVaccinationController
+RecordVaccinationController ..> Nurse
+RecordVaccinationController ..> VaccinationService
+Nurse -> VaccinationService: adopts
+RecordVaccinationController ..> VaccinationEvent
+
+' Service and Domain
+VaccinationService ..> VaccinationEventRepository
+VaccinationService ..> AppointmentRepository
+VaccinationService ..> VaccineRepository
+VaccinationService ..> VaccinationEvent
+VaccinationService ..> Appointment
+
+' Factory and Repositories
+Nurse "1" -down-> "1" RepositoryFactory: uses
+VaccinationEventRepository "1" -right-> "0..*" VaccinationEvent: records
+RepositoryFactory ..> VaccinationEventRepository
+RepositoryFactory ..> AppointmentRepository
+RepositoryFactory ..> VaccineRepository
+
+' Implementations (Based on v2 example)
+VaccinationEventMemoryRepository .up.|> VaccinationEventRepository
+MemoryRepositoryFactory .up.|> RepositoryFactory
+MemoryRepositoryFactory .right.> VaccinationEventMemoryRepository
+
+@enduml

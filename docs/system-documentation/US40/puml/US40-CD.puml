@@ -1,0 +1,66 @@
+@startuml
+title US40 - Class Diagram
+hide circle
+skinparam classAttributeIconSize 0
+
+class ConsultationView {
+}
+
+class ConsultationController {
+    + getWaitingRoom(centerId: String): List<WaitingRoomDto>
+}
+
+class Nurse {
+    - name: String
+    + getWaitingRoomService(): WaitingRoomService
+}
+
+class WaitingRoomService {
+    + WaitingRoomService(repo: AppointmentRepository)
+    + getWaitingList(centerId: String): List<WaitingRoomDto>
+}
+
+class WaitingRoomDto {
+    + snsUserName: String
+    + arrivalTime: DateTime
+}
+
+interface AppointmentRepository <<interface>> {
+    + findArrivedByCenter(centerId: String): List<Appointment>
+}
+
+interface RepositoryFactory <<interface>> {
+    + getAppointmentRepository(): AppointmentRepository
+}
+
+class Appointment {
+    - arrivalDateTime: DateTime
+    - status: String
+    + getSNSUser(): SNSUser
+}
+
+class SNSUser {
+    - name: String
+    - citizenCardNumber: String
+}
+
+' Relações baseadas no teu exemplo
+ConsultationView ..> ConsultationController
+ConsultationController ..> Nurse
+ConsultationController ..> WaitingRoomService
+ConsultationController ..> WaitingRoomDto
+
+Nurse ..> WaitingRoomService : uses
+Nurse ..> RepositoryFactory : uses
+
+WaitingRoomService ..> AppointmentRepository : uses
+WaitingRoomService ..> WaitingRoomDto : creates
+WaitingRoomService ..> Appointment : reads
+
+RepositoryFactory ..> AppointmentRepository : creates
+
+AppointmentRepository ..> Appointment : records
+Appointment --> SNSUser : relates to
+
+
+@enduml

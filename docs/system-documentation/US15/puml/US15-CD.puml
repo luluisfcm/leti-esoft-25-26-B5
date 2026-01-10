@@ -41,9 +41,4 @@ ListEmployeesByRoleUI ..> ListEmployeesByRoleController
 ListEmployeesByRoleController ..> StaffRepository
 
 StaffRepository "1" --> "0..*" StaffMember : manages >
-
-Receptionist --|> StaffMember
-Nurse --|> StaffMember
-DGSAdministrator --|> StaffMember
-
 @enduml

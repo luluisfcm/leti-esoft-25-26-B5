@@ -1,0 +1,16 @@
+@startuml
+title US12 - System Sequence Diagram
+autonumber
+
+actor "DGS Administrator" as ADM
+participant ":System" as SYS
+
+activate ADM
+ADM -> SYS : asks to list all vaccines
+activate SYS
+
+SYS --> ADM : displays the list of vaccines (grouped by type, sorted by brand)
+deactivate SYS
+deactivate ADM
+
+@enduml

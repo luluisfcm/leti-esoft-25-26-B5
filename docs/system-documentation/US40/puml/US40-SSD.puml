@@ -1,0 +1,22 @@
+@startuml
+title US40 - System Sequence Diagram
+autoactivate on
+autonumber
+
+actor "Nurse" as Nur
+participant ":System" as System
+
+activate Nur
+
+Nur -> System: asks to consult the waiting room list
+System --> Nur: requests the selection of the vaccination center
+
+Nur -> System: selects the requested vaccination center
+
+System --> Nur: shows the waiting list and requests confirmation to refresh/view
+
+Nur -> System: confirms the view
+System --> Nur: displays the sorted list of SNS users
+
+deactivate Nur
+@enduml
