@@ -51,7 +51,7 @@ To identify domain conceptual classes, we started by making a list of candidate 
 * `VaccinationCenter` – abstract place where vaccination occurs.
 * `HealthcareCenter` – vaccination center located in a regular healthcare facility.
 * `CommunityMassVaccinationCenter` – vaccination center used for large-scale mass vaccination campaigns.
-
+* `WaitingRoom` – represents the waiting room or queue area of a vaccination center where SNS users wait after check-in.
 ---
 
 **Noteworthy Events**
@@ -60,7 +60,7 @@ To identify domain conceptual classes, we started by making a list of candidate 
 * `Appointment` – event where a SNS user is scheduled for vaccination.
 * `VaccinationEvent` – event where a vaccine is actually administered.
 * `AdverseReaction` – clinically relevant reaction observed after a vaccination event.
-
+* `CheckIn` – represents the event/state of the SNS user's arrival at the vaccination center.
 ---
 
 **Physical Objects**
@@ -143,22 +143,25 @@ An association is a relationship between instances of objects that indicates a r
 
 Based on these heuristics and on the global Domain Model, the main associations are:
 
-| Concept (A)              | Association                        | Concept (B)                  |
-|--------------------------|:----------------------------------:|------------------------------|
-| `SNSUser`                | schedules                          | `Appointment`                |
-| `Appointment`            | at                                 | `VaccinationCenter`         |
-| `Appointment`            | is for                             | `VaccineType`               |
-| `Appointment`            | results in                         | `VaccinationEvent`          |
-| `VaccinationEvent`       | records brand/lot of               | `Vaccine`                   |
-| `VaccinationEvent`       | captures                           | `AdverseReaction`           |
-| `SNSUser`                | obtains                            | `VaccinationCertificate`    |
-| `VaccinationEvent`       | documents                          | `VaccinationCertificate`    |
-| `Nurse`                  | administers                        | `VaccinationEvent`          |
-| `Nurse`                  | issues on-site                     | `VaccinationCertificate`    |
-| `StaffMember`            | works at                           | `VaccinationCenter`         |
-| `VaccinationCenter`      | supports                           | `VaccineType`               |
-| `VaccineType`            | has brands of                      | `Vaccine`                   |
-| `Outbreak`               | defaultFor                         | `VaccineType`               |
+| Concept (A)      |     Association      | Concept (B)              |
+|------------------|:--------------------:|--------------------------|
+| `SNSUser`        |      schedules       | `Appointment`            |
+| `Appointment`    |          at          | `VaccinationCenter`      |
+| `Appointment`    |        is for        | `VaccineType`            |
+| `Appointment`    |      results in      | `VaccinationEvent`       |
+| `VaccinationEvent` | records brand/lot of | `Vaccine`                |
+| `VaccinationEvent` |       captures       | `AdverseReaction`        |
+| `SNSUser`        |       obtains        | `VaccinationCertificate` |
+| `VaccinationEvent` |      documents       | `VaccinationCertificate` |
+| `Nurse`          |     administers      | `VaccinationEvent`       |
+| `Nurse`          |    issues on-site    | `VaccinationCertificate` |
+| `StaffMember`    |       works at       | `VaccinationCenter`      |
+| `VaccinationCenter` |       supports       | `VaccineType`            |
+| `VaccineType`    |    has brands of     | `Vaccine`                |
+| `Outbreak`       |      defaultFor      | `VaccineType`            |
+| `vaccinationCenter` |         has          | `WaitingRoom`            |
+| `Appointment`    |      generates       | `CheckIn`                |
+| `CheckIn`         |      assigns to      | `WaintingRoom`            |
 
 Each of these associations comes directly from requirements phrased in terms of “who schedules what”, “where an appointment takes place”, “which vaccine type a center supports”, “what a vaccination event records”, and “who issues certificates”, which are captured by the verbs used above.
 
@@ -218,6 +221,14 @@ Below is a summary of the main concepts and their attributes, as defined in the 
 - **Outbreak**  
   Attributes: `name`, `startDate`, `current`  
   Represents a disease outbreak; used to configure the default `VaccineType` that should be used while the outbreak is current.
+
+- **WaitingRoom**  
+  Attributes: `name`  
+  Represents the waiting room (or queue area) of a vaccination center where SNS users wait after check-in.
+
+- **CheckIn**  
+  Attributes: `dateTime`  
+  Represents the event/state that records the arrival of an SNS user at the vaccination center, associated with an appointment and a waiting room.
 
 The associations among these concepts (as detailed in the previous table) complete the Domain Model and capture how users, staff, centers, vaccine types, vaccines, appointments, events, reactions, certificates and outbreaks relate to each other in the Pandemic Vaccination Management System (PVMS).
 

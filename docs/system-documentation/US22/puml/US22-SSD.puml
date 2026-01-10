@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autoactivate on
+autonumber
+
+actor "Receptionist" as Receptionist
+participant ":System" as System
+
+activate Receptionist
+
+Receptionist -> System: asks to register the arrival of an SNS user
+System --> Receptionist: requests the SNS user number and the vaccination center
+
+Receptionist -> System: enters snsUserNumber and selects vaccinationCenter
+System --> Receptionist: shows today's scheduled appointment \n and asks to confirm the check-in
+
+Receptionist -> System: confirms check-in
+System --> Receptionist: informs operation success \n (check-in created and waiting room assigned)
+
+@enduml

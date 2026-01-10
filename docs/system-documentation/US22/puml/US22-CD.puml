@@ -1,0 +1,109 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide circle
+skinparam classAttributeIconSize 0
+
+class RegisterArrivalView {
+}
+
+class RegisterArrivalController {
+  +registerArrival(RegisterArrivalRequestDTO req): AppointmentSummaryDTO
+  +confirmCheckIn(string appointmentId): RegisterArrivalResultDTO
+}
+
+class Receptionist {
+  +getArrivalService(): ArrivalService
+}
+
+class ArrivalService {
+  +ArrivalService(AppointmentRepository appRepo, CheckInRepository checkRepo, WaitingRoomRepository wrRepo)
+  +getTodayAppointmentSummary(RegisterArrivalRequestDTO req): AppointmentSummaryDTO
+  +registerCheckIn(string appointmentId): RegisterArrivalResultDTO
+}
+
+interface RepositoryFactory <<interface>> {
+  +getAppointmentRepository(): AppointmentRepository
+  +getCheckInRepository(): CheckInRepository
+  +getWaitingRoomRepository(): WaitingRoomRepository
+}
+
+interface AppointmentRepository <<interface>> {
+  +findTodayAppointment(string snsUserNumber, string vaccinationCenterId, Date today): Appointment
+  +getById(string appointmentId): Appointment
+  +save(Appointment appt): Result
+}
+
+interface CheckInRepository <<interface>> {
+  +existsForAppointment(string appointmentId): boolean
+  +save(CheckIn checkIn): Result
+}
+
+interface WaitingRoomRepository <<interface>> {
+  +getDefaultWaitingRoom(string vaccinationCenterId): WaitingRoom
+}
+
+
+class Appointment {
+  - date : Date
+  - time : Time
+  - status : AppointmentStatus
+  - arrivalDateTime : DateTime
+  +setStatus(AppointmentStatus st): void
+  +setArrivalDateTime(DateTime dt): void
+}
+
+class WaitingRoom {
+  - name : String
+  +getName(): String
+}
+
+class CheckIn {
+  - dateTime : DateTime
+  +CheckIn(DateTime dt, string appointmentId, WaitingRoom wr)
+}
+
+class RegisterArrivalRequestDTO {
+  +snsUserNumber : string
+  +vaccinationCenterId : string
+}
+
+class AppointmentSummaryDTO {
+  +appointmentId : string
+  +date : Date
+  +time : Time
+  +status : AppointmentStatus
+}
+
+class RegisterArrivalResultDTO {
+  +success : boolean
+  +message : string
+  +checkInId : string
+  +waitingRoomName : string
+  +arrivalDateTime : DateTime
+}
+
+
+
+' ---------------- Relationships (same style as professor) ----------------
+Receptionist "1" -down-> "1" RepositoryFactory : uses
+AppointmentRepository "1" -right-> "0..*" Appointment : records
+CheckInRepository "1" -right-> "0..*" CheckIn : records
+WaitingRoomRepository "1" -right-> "0..*" WaitingRoom : records
+
+RegisterArrivalView ..> RegisterArrivalController
+RegisterArrivalController ..> Receptionist
+RegisterArrivalController ..> ArrivalService
+
+ArrivalService ..> AppointmentRepository
+ArrivalService ..> CheckInRepository
+ArrivalService ..> WaitingRoomRepository
+ArrivalService ..> Appointment
+ArrivalService ..> CheckIn
+ArrivalService ..> WaitingRoom
+
+RepositoryFactory .right.> AppointmentRepository
+RepositoryFactory .right.> CheckInRepository
+RepositoryFactory .right.> WaitingRoomRepository
+
+@enduml
