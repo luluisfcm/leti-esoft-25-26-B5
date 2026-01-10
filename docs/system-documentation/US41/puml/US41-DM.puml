@@ -1,28 +1,19 @@
 @startuml
-title MD – US41 Record Vaccine Administration
+title MD – US41 Record Vaccine Administration (Corrected)
 
 hide circle
 hide methods
 skinparam classAttributeIconSize 0
-
-' ===================== Classes =====================
 
 class Nurse {
 }
 
 class SNSUser {
   + name : String
-  + dateOfBirth : Date
-  + sex : String
-  + postalAddress : String
-  + phone : String
-  + email : String
   + citizenCardNumber : String
 }
 
 class Appointment {
-  + date : Date
-  + time : Time
   + status : AppointmentStatus
   + arrivalDateTime : DateTime
 }
@@ -35,18 +26,12 @@ class VaccinationEvent {
 class Vaccine {
   + commercialName : String
   + brand : String
-  + technologyUsed : String
 }
 
-class RecoveryRoom {
-}
-
-' ===================== Associações =====================
-
+' Associações
 Nurse "1" -- "0..*" VaccinationEvent : records >
-VaccinationEvent "0..*" -- "1" Vaccine : of >
+VaccinationEvent "0..*" -- "1" Vaccine : records brand/lot of >
 Appointment "1" -- "0..1" VaccinationEvent : results in >
 SNSUser "1" -- "0..*" Appointment : has >
 
-SNSUser "1" -- "0..1" RecoveryRoom : is assigned to >
 @enduml
