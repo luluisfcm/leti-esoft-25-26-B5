@@ -1,60 +1,48 @@
 @startuml
-'https://plantuml.com/sequence-diagram
 title US13 - Sequence Diagram
 autoactivate on
 autonumber
 
 actor "DGS Administrator" as Admin
-participant ":RegisterVaccinationCenterView" as System
+participant ":RegisterVaccinationCenterView" as UI
 participant ":RegisterVaccinationCenterController" as Ctrl
-participant "service\n:VaccinationCenterService" as Service
-participant "repoCenters\n:VaccinationCenterRepository" as RepoCenter
-participant "repoVaccines\n:VaccineTypeRepository" as RepoVaccine
-participant "dto:VaccinationCenterDto" as CenterDto
+participant ":DGSAdministrator" as ObjAdmin
+participant "service:VaccinationCenterService" as Service
+participant "repoVaccines:VaccineTypeRepository" as RepoVaccine
+participant "repoCenters:VaccinationCenterRepository" as RepoCenter
+participant "dto:VaccinationCenterDto" as Dto
 participant "center:VaccinationCenter" as Center
 
 activate Admin
-
-Admin -> System: asks to register a vaccination center
-System -> Ctrl: start()
-
+Admin -> UI: asks to register a vaccination center
+UI -> Ctrl: getVaccineTypes()
+Ctrl -> ObjAdmin: getVaccinationCenterService()
+ObjAdmin --> Ctrl: service
 Ctrl -> Service: getVaccineTypes()
 Service -> RepoVaccine: getAll()
 RepoVaccine --> Service: List<VaccineType>
 Service --> Ctrl: List<VaccineType>
-Ctrl --> System: List<VaccineType>
+Ctrl --> UI: List<VaccineType>
+UI --> Admin: requests data & vaccine types
 
-System --> Admin: requests center data\n(name, address, phone, email, website,\nmaxVaccinesPerHour, openingHours, closingHours, type)
-System --> Admin: if Community Center, select vaccine types
-
-Admin -> System: types all requested data and selects vaccine types
-
-System --> CenterDto**: create(name, address, phone, email, website,\nmaxPerHour, opening, closing, type, vaccineTypeIds)
-System --> Admin: shows all data and requests confirmation
-Admin -> System: confirms the data
-
-System -> Ctrl: registerVaccinationCenter(dto)
+Admin -> UI: submits data
+UI -> Dto**: create(...)
+UI -> Ctrl: registerVaccinationCenter(dto)
 Ctrl -> Service: register(dto)
 
-loop for each vaccineTypeId
-Service -> CenterDto: getVaccineTypeIds()
-CenterDto --> Service: vaccineTypeId
-Service -> RepoVaccine: getById(vaccineTypeId)
-RepoVaccine --> Service: VaccineType
+' Correção do Loop: obter a lista antes de iterar
+Service -> Dto: getVaccineTypeIds()
+Dto --> Service: listIds
+loop for each id in listIds
+    Service -> RepoVaccine: getById(id)
+    RepoVaccine --> Service: vaccineType
 end
 
-note over Service, CenterDto: extracting data from DTO
-
-Service --> Center**: create(name, address, phone, email, website,\nmaxPerHour, opening, closing, type, vaccines)
-
+Service -> Center**: create(dto, vaccineTypes)
 Service -> Service: validate(center)
-Service --> Service: ok
-
 Service -> RepoCenter: save(center)
-RepoCenter --> Service: ok
-
-Service --> Ctrl: ok
-Ctrl --> System: ok
-System --> Admin: informs operation success
-
+RepoCenter --> Service: result
+Service --> Ctrl: result
+Ctrl --> UI: result
+UI --> Admin: informs success
 @enduml

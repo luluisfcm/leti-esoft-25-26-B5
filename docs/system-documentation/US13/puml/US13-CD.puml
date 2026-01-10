@@ -1,34 +1,33 @@
 @startuml
 title US13 - Class Diagram
-'https://plantuml.com/class-diagram
-
 hide circle
 skinparam classAttributeIconSize 0
 
-' ===================== View =====================
+' --- View ---
 class RegisterVaccinationCenterView {
 }
 
-' ===================== Controller =====================
+' --- Controller ---
 class RegisterVaccinationCenterController {
     +getVaccineTypes(): List<VaccineType>
     +registerVaccinationCenter(dto: VaccinationCenterDto): Result
 }
 
-' ===================== Actor =====================
+' --- Actor/Domain Context ---
 class DGSAdministrator {
     - name
+    - email
     + getVaccinationCenterService(): VaccinationCenterService
 }
 
-' ===================== Service =====================
+' --- Service ---
 class VaccinationCenterService {
-    + VaccinationCenterService(centerRepo: VaccinationCenterRepository, vaccineRepo: VaccineTypeRepository)
+    + VaccinationCenterService(centerRepo, vaccineRepo)
     + getVaccineTypes(): List<VaccineType>
     + register(dto: VaccinationCenterDto): Result
 }
 
-' ===================== DTO =====================
+' --- DTO ---
 class VaccinationCenterDto {
     - name
     - postalAddress
@@ -40,9 +39,10 @@ class VaccinationCenterDto {
     - closingHours
     - type
     - vaccineTypeIds : List<String>
+    + getVaccineTypeIds(): List<String>
 }
 
-' ===================== Repositories =====================
+' --- Repositories ---
 interface VaccinationCenterRepository <<interface>> {
     + save(center: VaccinationCenter): Result
 }
@@ -52,13 +52,7 @@ interface VaccineTypeRepository <<interface>> {
     + getById(id: String): VaccineType
 }
 
-' ===================== Repository Factory =====================
-interface RepositoryFactory <<interface>> {
-    + getVaccinationCenterRepository(): VaccinationCenterRepository
-    + getVaccineTypeRepository(): VaccineTypeRepository
-}
-
-' ===================== Domain =====================
+' --- Domain ---
 abstract class VaccinationCenter {
     - name
     - postalAddress
@@ -73,35 +67,18 @@ abstract class VaccinationCenter {
 class CommunityMassVaccinationCenter
 class HealthcareCenter
 
-class VaccineType {
-    - disease
-    - shortDescription
-}
-
+' Inheritance and Associations
 VaccinationCenter <|-- CommunityMassVaccinationCenter
 VaccinationCenter <|-- HealthcareCenter
-
 VaccinationCenter "1" -right-> "0..*" VaccineType : supports >
-CommunityMassVaccinationCenter "1" -right-> "1..*" VaccineType : administers >
+CommunityMassVaccinationCenter "1" --> "1..*" VaccineType : administers >
 
-' ===================== Associations =====================
+' Dependencies
 RegisterVaccinationCenterView ..> RegisterVaccinationCenterController
-RegisterVaccinationCenterView ..> VaccineType
-
 RegisterVaccinationCenterController ..> DGSAdministrator
 RegisterVaccinationCenterController ..> VaccinationCenterService
-
 VaccinationCenterService ..> VaccinationCenterRepository
 VaccinationCenterService ..> VaccineTypeRepository
 VaccinationCenterService ..> VaccinationCenterDto
 VaccinationCenterService ..> VaccinationCenter
-
-DGSAdministrator "1" -down-> "1" RepositoryFactory : uses
-
-RepositoryFactory .right.> VaccinationCenterRepository
-RepositoryFactory .right.> VaccineTypeRepository
-
-VaccinationCenterRepository "1" -right-> "0..*" VaccinationCenter : records
-VaccineTypeRepository "1" -right-> "0..*" VaccineType : records
-
 @enduml
