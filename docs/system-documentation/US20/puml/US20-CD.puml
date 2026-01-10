@@ -1,74 +1,64 @@
 @startuml
-title US20 - Class Diagram (Design)
+'https://plantuml.com/class-diagram
+
 hide circle
 skinparam classAttributeIconSize 0
-allow_mixing
 
 class RegisterSNSUserView {
 }
 
 class RegisterSNSUserController {
-    + registerSNSUser(dto: SNSUserDto): Result
+    +registerSNSUser(name, address, sex, phone, email, birth, snsNumber, ccNumber): void
+    +saveRegisteredSNSUser(): Result
 }
 
-class DGSAdministrator {
-    - name: String
-    + getSNSUserService(): SNSUserService
+class Receptionist {
+    - name
+    +getSNSUserService(): SNSUserService
 }
 
 class SNSUserService {
-    + SNSUserService(repo: SNSUserRepository)
-    + register(dto: SNSUserDto): Result
-}
-
-class SNSUserDto {
-    + name: String
-    + dateOfBirth: Date
-    + sex: String
-    + postalAddress: String
-    + phone: String
-    + email: String
-    + citizenCardNumber: String
-    + snsUserNumber: String
+    +SNSUserService(SNSUserRepository repo)
+    +create(name, address, sex, phone, email, birth, snsNumber, ccNumber): SNSUser
+    +addOrUpdate(SNSUser user): Result
+    -validate(SNSUser user): boolean
 }
 
 interface SNSUserRepository <<interface>> {
-    + save(user: SNSUser): Result
-    + findByUniqueAttributes(phone, email, cc, sns): SNSUser
+    +save(SNSUser user): Result
+    +findByPhone(phone): SNSUser
+    +findByEmail(email): SNSUser
+    +findBySNSNumber(snsNumber): SNSUser
+    +findByCCNumber(ccNumber): SNSUser
 }
 
 interface RepositoryFactory <<interface>> {
-    + getSNSUserRepository(): SNSUserRepository
+    +getSNSUserRepository(): SNSUserRepository
 }
 
 class SNSUser {
     - name: String
-    - dateOfBirth: Date
+    - address: String
     - sex: String
-    - postalAddress: String
     - phone: String
     - email: String
-    - citizenCardNumber: String
-    - snsUserNumber: String
-    + SNSUser(name, address, sex, phone, email, cc, sns)
-    + validate(): boolean
+    - birthDate: Date
+    - snsNumber: String
+    - ccNumber: String
+    +SNSUser(name, address, sex, phone, email, birth, snsNumber, ccNumber)
 }
 
-' Relações Estruturais (Iguais à tua imagem)
+Receptionist "1" -down-> "1" RepositoryFactory: uses
+SNSUserRepository "1" -right-> "0..*" SNSUser: records
+
 RegisterSNSUserView ..> RegisterSNSUserController
-RegisterSNSUserController ..> DGSAdministrator
+RegisterSNSUserController ..> Receptionist
 RegisterSNSUserController ..> SNSUserService
-RegisterSNSUserController ..> SNSUserDto
+SNSUserService ..> SNSUserRepository
+SNSUserService ..> SNSUser
+RegisterSNSUserController ..> SNSUser
 
-DGSAdministrator ..> SNSUserService : uses/creates
-DGSAdministrator ..> RepositoryFactory : uses
-
-SNSUserService ..> SNSUserRepository : uses
-SNSUserService ..> SNSUser : creates
-SNSUserService ..> SNSUserDto : reads
-
-RepositoryFactory ..> SNSUserRepository : creates
-
-SNSUserRepository ..> SNSUser : records
+Receptionist -> SNSUserService: adopts
+RepositoryFactory .right.> SNSUserRepository
 
 @enduml
