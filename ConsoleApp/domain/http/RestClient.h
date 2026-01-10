@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
 #include <map>
-#include "RestAPI/thirdparty/httplib.h"
+#include "httplib.h"
+
 
 struct HttpResult {
     bool ok = false;          // request feita com sucesso (rede)

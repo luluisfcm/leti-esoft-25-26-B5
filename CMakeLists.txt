@@ -14,3 +14,7 @@ add_subdirectory(RestAPI)
 
 # Unit tests
 add_subdirectory(CoreTests)
+
+add_subdirectory(ConsoleApp)
+
+
