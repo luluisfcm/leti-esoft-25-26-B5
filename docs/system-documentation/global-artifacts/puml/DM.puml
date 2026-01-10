@@ -6,7 +6,7 @@ skinparam classAttributeIconSize 0
 
 ' ===================== SNS Users =====================
 class SNSUser {
-
+  + snsUserNumber : String
   + name : String
   + dateOfBirth : Date
   + sex : String
@@ -111,6 +111,14 @@ class Outbreak {
   + current : Boolean
 }
 
+class WaitingRoom {
+  + name : String
+}
+
+class CheckIn {
+  + dateTime : DateTime
+}
+
 ' ===================== Associations =====================
 SNSUser "1" -- "0..*" Appointment : schedules >
 Appointment "0..*" -- "1" VaccinationCenter : at >
@@ -128,4 +136,9 @@ Nurse "1" -- "0..*" VaccinationCertificate : issues on-site >
 StaffMember "0..*" -- "0..*" VaccinationCenter : works at >
 
 Outbreak "0..1" -- "1" VaccineType : defaultFor >
+
+VaccinationCenter "1" -- "1..*" WaitingRoom : has >
+Appointment "1" -- "0..1" CheckIn : generates >
+CheckIn "1" -- "1" WaitingRoom : assigns to >
+
 @enduml

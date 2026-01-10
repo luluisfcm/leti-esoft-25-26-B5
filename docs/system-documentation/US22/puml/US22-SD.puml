@@ -1,0 +1,95 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autoactivate on
+autonumber
+
+actor "Receptionist" as User
+participant ":RegisterArrivalView" as System
+participant ":RegisterArrivalController" as Ctrl
+participant ":Receptionist" as Receptionist
+participant "service:ArrivalService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:AppointmentRepository" as AppRepo
+participant "repo:CheckInRepository" as CheckRepo
+participant "repo:WaitingRoomRepository" as WRRepo
+
+participant "req:RegisterArrivalRequestDTO" as Req
+participant "apptDTO:AppointmentSummaryDTO" as ApptDTO
+participant "res:RegisterArrivalResultDTO" as Res
+
+participant "appt:Appointment" as Appt
+participant "wr:WaitingRoom" as WR
+participant "checkIn:CheckIn" as CheckIn
+
+activate User
+
+User -> System: asks to register the arrival of an SNS user
+System --> User: requests the SNS user number and the vaccination center
+
+User -> System: enters snsUserNumber and selects vaccinationCenter
+System -> Req**: create(snsUserNumber, vaccinationCenterId)
+
+System -> Ctrl: registerArrival(req)
+Ctrl -> Receptionist: getArrivalService()
+Receptionist -> Factory: getAppointmentRepository()
+Factory --> Receptionist: appRepo
+Receptionist -> Factory: getCheckInRepository()
+Factory --> Receptionist: checkRepo
+Receptionist -> Factory: getWaitingRoomRepository()
+Factory --> Receptionist: wrRepo
+Receptionist --> Service**: create(appRepo, checkRepo, wrRepo)
+Receptionist --> Ctrl: service
+
+Ctrl -> Service: getTodayAppointmentSummary(req)
+Service -> AppRepo: findTodayAppointment(req.snsUserNumber, req.vaccinationCenterId, today)
+AppRepo --> Service: appt
+
+alt appointment not found
+  Service -> Res**: createFailure("No appointment scheduled for today")
+  Service --> Ctrl: res
+  Ctrl --> System: res
+  System --> User: informs operation failure \n (no appointment for today)
+else appointment found
+  Service -> ApptDTO**: create(appointmentId, date, time, status)
+  Service --> Ctrl: apptDTO
+  Ctrl --> System: apptDTO
+  System --> User: shows today's scheduled appointment \n and asks to confirm the check-in
+end
+
+User -> System: confirms check-in
+System -> Ctrl: confirmCheckIn(apptDTO.appointmentId)
+
+Ctrl -> Service: registerCheckIn(apptDTO.appointmentId)
+
+Service -> CheckRepo: existsForAppointment(appointmentId)
+CheckRepo --> Service: exists?
+
+alt check-in already exists (AC22-1)
+  Service -> Res**: createFailure("Arrival already registered today")
+  Service --> Ctrl: res
+  Ctrl --> System: res
+  System --> User: informs operation failure (duplicate arrival)
+else no check-in
+  Service -> AppRepo: getById(appointmentId)
+  AppRepo --> Service: appt
+
+  Service -> WRRepo: getDefaultWaitingRoom(appt.vaccinationCenterId)
+  WRRepo --> Service: wr
+
+  Service -> CheckIn**: create(now, appointmentId, wr)
+  Service -> CheckRepo: save(checkIn)
+  CheckRepo --> Service: ok
+
+  Service -> Appt: setStatus(Arrived)
+  Service -> Appt: setArrivalDateTime(now)
+  Service -> AppRepo: save(appt)
+  AppRepo --> Service: ok
+
+  Service -> Res**: createSuccess(checkInId, wr.name, now)
+  Service --> Ctrl: res
+  Ctrl --> System: res
+  System --> User: informs operation success \n (check-in created and waiting room assigned)
+end
+
+@enduml

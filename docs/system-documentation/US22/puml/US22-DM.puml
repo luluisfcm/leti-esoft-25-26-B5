@@ -1,0 +1,51 @@
+@startuml
+'title US22 – Domain Model Excerpt – Register Arrival
+
+hide methods
+hide circle
+skinparam classAttributeIconSize 0
+
+' ===== Core concepts reused from Global Domain Model =====
+class SNSUser {
+  + snsUserNumber : String
+  + name : String
+}
+
+'enum AppointmentStatus {
+  'Scheduled
+  'Arrived
+  'Ready
+  'InProgress
+  'Vaccinated
+  'Cancelled
+ ' NoShow
+'}
+
+class Appointment {
+  + date : Date
+  + time : Time
+  + status : AppointmentStatus
+  + arrivalDateTime : DateTime
+}
+
+abstract VaccinationCenter {
+  + name : String
+}
+
+' ===== Concepts introduced/used explicitly by US22 =====
+class CheckIn {
+  + dateTime : DateTime
+}
+
+class WaitingRoom {
+  + name : String
+}
+
+' ===== Associations (excerpt) =====
+SNSUser "1" -- "0..*" Appointment : schedules >
+Appointment "0..*" -- "1" VaccinationCenter : at >
+VaccinationCenter "1" -- "1..*" WaitingRoom : has >
+Appointment "1" -- "0..1" CheckIn : generates >
+CheckIn "1" -- "1" WaitingRoom : assigns to >
+
+@enduml

@@ -6,36 +6,44 @@ skinparam classAttributeIconSize 0
 hide methods
 
 class SNSUser {
-  + snsNumber : String
   + name : String
-  + birthDate : Date
+  + dateOfBirth : Date
+  + phone : String
+  + email : String
 }
 
-class Receptionist {
-  + employeeId : String
+abstract VaccinationCenter {
   + name : String
+  + postalAddress : String
+  + phone : String
+  + email : String
 }
 
 class VaccineType {
-  + code : String
-  + description : String
+  + disease : String
+  + shortDescription : String
 }
 
-class VaccinationCenter {
-  + centerId : String
+
+class Appointment {
+  + date : Date
+  + time : Time
+  + status : AppointmentStatus
+  + arrivalDateTime : DateTime
+}
+
+class Receptionist {
   + name : String
-  + location : String
+  + phone : String
+  + email : String
 }
 
-class VaccineAppointment {
-  + appointmentId : String
-  + dateTime : DateTime
-  + status : String
-}
+' Associations (as in global DM)
+SNSUser "1" -- "0..*" Appointment : schedules
+Appointment "0..*" -- "1" VaccinationCenter : at
+Appointment "0..*" -- "1" VaccineType : is for
+Appointment "0..*" -- "0..1" Receptionist : scheduledBy
 
-VaccineAppointment "0..*" -- "1" SNSUser           : forUser
-VaccineAppointment "0..*" -- "1" VaccineType       : ofType
-VaccineAppointment "0..*" -- "1" VaccinationCenter : atCenter
-VaccineAppointment "0..*" -- "0..1" Receptionist   : scheduledBy
+VaccinationCenter "1" -- "0..*" VaccineType : supports
 
 @enduml
