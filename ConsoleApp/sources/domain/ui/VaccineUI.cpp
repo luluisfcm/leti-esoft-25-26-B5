@@ -1,4 +1,4 @@
-#include "/domain/ui/VaccineUI.h"
+#include "ui/VaccineUI.h"
 
 #include <iostream>
 #include <limits>

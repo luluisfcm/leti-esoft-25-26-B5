@@ -1,5 +1,5 @@
 #pragma once
-#include "/domain/http/RestClient.h"
+#include "http/RestClient.h"
 
 class VaccineUI {
     RestClient &client;

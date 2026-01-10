@@ -1,4 +1,4 @@
-#include "/domain/http/RestClient.h"
+#include "http/RestClient.h"
 
 RestClient::RestClient(std::string host, int port, std::string authToken)
     : host(std::move(host)), port(port), authToken(std::move(authToken)) {}

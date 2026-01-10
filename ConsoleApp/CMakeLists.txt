@@ -8,23 +8,29 @@ add_executable(ConsoleApp
         ConsoleApp.cpp
         sources/domain/shared/Result.cpp
         sources/domain/shared/StringUtils.cpp
-
-        # HTTP client + UI
         sources/domain/http/RestClient.cpp
         sources/domain/ui/VaccineUI.cpp
+        sources/domain/ui/VaccineTypeUI.cpp
+
 )
+
+# Resolve o problema do CreateFile2 no Windows headers (MinGW)
+target_compile_definitions(ConsoleApp PRIVATE
+        CPPHTTPLIB_NO_MMAP
+        _WIN32_WINNT=0x0602
+        WINVER=0x0602
+)
+
+# Diretório raiz do repo (um nível acima de ConsoleApp/)
+get_filename_component(REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
 target_include_directories(ConsoleApp PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/domain
-
-        # para poderes fazer: #include "../../RestAPI/thirdparty/httplib.h"
-        ${CMAKE_CURRENT_SOURCE_DIR}/../RestAPI/thirdparty
-        ${CMAKE_CURRENT_SOURCE_DIR}/../RestAPI/headers
+        "${CMAKE_CURRENT_LIST_DIR}/domain"
+        "${REPO_ROOT}/RestAPI/thirdparty"
+        "${REPO_ROOT}/RestAPI/headers"
 )
 
-# Se estiveres no Windows, precisas disto para sockets (igual ao RestAPI)
-if (WIN32)
-    target_link_libraries(ConsoleApp ws2_32)
-endif()
-
-target_link_libraries(ConsoleApp Core)
+target_link_libraries(ConsoleApp PRIVATE
+        Core
+        $<$<BOOL:${WIN32}>:ws2_32>
+)
