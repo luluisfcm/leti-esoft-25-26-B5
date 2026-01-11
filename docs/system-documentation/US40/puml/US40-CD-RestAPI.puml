@@ -1,7 +1,5 @@
 @startuml
-'https://plantuml.com/class-diagram
 left to right direction
-
 hide circle
 skinparam classAttributeIconSize 0
 
@@ -11,24 +9,27 @@ class WaitingRoomController {
     +getWaitingRoomList(centerId: String): HttpResult
 }
 
+class CheckInService {
+    +getWaitingRoomList(centerId: String): List<CheckIn>
+}
+
+interface CheckInRepository <<interface>> {
+    +findByCenter(centerId: String): List<CheckIn>
+}
+
 class WaitingRoomMapper {
-    +toJson(CheckIn checkIn): json
-    +toJson(List<CheckIn> list): json
+    +toJson(checkIn: CheckIn): json
+    +toJson(list: List<CheckIn>): json
 }
 
 class HttpResult {
     -status: HttpStatus
     -result: json
-    HttpResult();
-    HttpResult(HttpStatus status);
-    HttpResult(HttpStatus status, const wstring &message);
-    HttpResult(HttpStatus status, const string &message);
-    HttpResult(HttpStatus status, const char *message);
-    HttpResult(HttpStatus status, const json &result);
+    +HttpResult(status: HttpStatus, result: json)
 }
 
-' Relationships based on the template
-WaitingRoomController ..> WaitingRoomMapper
-WaitingRoomController ..> HttpResult
-
+WaitingRoomController ..> CheckInService : uses
+WaitingRoomController ..> WaitingRoomMapper : uses
+WaitingRoomController ..> HttpResult : creates
+CheckInService ..> CheckInRepository : uses
 @enduml
