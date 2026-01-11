@@ -1,82 +1,102 @@
 @startuml
 'https://plantuml.com/use-case-diagram
+left to right direction
 
-title PVMS – Pandemic Vaccination Management System (Use Case Diagram)
+title PVMS – Pandemic Vaccination Management System (Complete UCD)
 
-' Atores
+' --- Atores ---
 :SNS User: as SNS
 :Receptionist: as REC
 :Nurse: as NUR
 :DGS Administrator: as ADM
 (Time/Notification Service) as NOTIF
 
-' Use Cases principais
-(UC01 - Register SNS User) as UC01
-(UC02 - Schedule Vaccination Appointment) as UC02
-(UC03 - Get Vaccination Certificate) as UC03
-(UC04 - Register Arrival / Check-in) as UC04
-(UC05 - View Waiting Queue) as UC05
-(UC06 - Administer Vaccine) as UC06
-(UC07 - Record Vaccination Event) as UC07
-(UC08 - Record Adverse Reaction) as UC08
-(UC09 - Issue Certificate On-site) as UC09
+' --- Use Cases ---
 
-' Administração / Configuração
+' US20 - Registration
+(UC20 - Register SNS User) as UC20
+
+' US21 & US30 - Scheduling (Unificados pois o objetivo é o mesmo)
+(UC21/30 - Schedule Vaccine Administration) as UC21_30
+
+' US22 - Arrival
+(UC22 - Register Arrival / Check-in) as UC22
+
+' US40 - Waiting Room
+(UC40 - Consult Users in Waiting Room) as UC40
+
+' US41 - Administration
+(UC41 - Record Vaccine Administration) as UC41
+
+' Outros Use Cases de Manutenção/Configuração
 (UC10 - Manage Vaccination Centers) as UC10
-(UC11 - Manage Personnel) as UC11
 (UC12 - Manage Vaccine Types & Brands) as UC12
-(UC13 - Set Current Outbreak & Default Vaccine Type) as UC13
+(UC13 - Set Current Outbreak) as UC13
+(UC03 - Get Vaccination Certificate) as UC03
+(UC08 - Record Adverse Reaction) as UC08
 
-' Serviços auxiliares
-(UC14 - Notify Appointment Confirmation) as UC14
+' Serviços auxiliares / Inclusões
 (UC15 - Capacity Check) as UC15
+(UC14 - Notify Confirmation) as UC14
 
-' Ligações ator → UC
-SNS --> UC02
+' --- Ligações Ator → UC ---
+
+' SNS User
+SNS --> UC21_30 : US30
 SNS --> UC03
-REC --> UC01
-REC --> UC04
-REC --> UC02
-NUR --> UC05
-NUR --> UC06
-NUR --> UC07
+
+' Receptionist
+REC --> UC20 : US20
+REC --> UC21_30 : US21
+REC --> UC22 : US22
+
+' Nurse
+NUR --> UC40 : US40
+NUR --> UC41 : US41
 NUR --> UC08
-NUR --> UC09
+
+' Admin
 ADM --> UC10
-ADM --> UC11
 ADM --> UC12
 ADM --> UC13
 
-' Relações entre UCs
-UC02 --> UC15
-UC02 --> UC14
-UC14 ..> NOTIF : «external»
-UC06 --> UC07
-UC06 ..> UC08 : «if reaction»
-UC10 --> UC12 : «include»
+' --- Relações entre UCs e Regras de Negócio ---
 
-' Notas de contexto (exemplos)
-note bottom of UC15
-Check center timeslot capacity
-(max vaccines/hour)
+' Agendamento inclui verificação de capacidade e notificação
+UC21_30 ..> UC15 : <<include>>
+UC21_30 ..> UC14 : <<include>>
+UC14 ..> NOTIF : <<external>>
+
+' Notas com Critérios de Aceitação (ACs)
+note bottom of UC20
+  **US20 (ACs):**
+  - Validates PT formats (Phone, CC)
+  - Uniqueness of SNS number/Email
+  - Sex is optional
 end note
 
-note right of NUR
-Only nurses access full health data
+note bottom of UC21_30
+  **US21/30 (ACs):**
+  - Validates center capacity
+  (max vaccines/hour)
 end note
 
-note bottom of UC01
-Assumed role, as receptionists
-already provide in-person support
-for scheduling.
+note bottom of UC22
+  **US22 (ACs):**
+  - No duplicate entries/day
+  - Assigns user to Waiting Room
 end note
 
-note bottom of UC10
-Manage center data:
-- Create/update center info
-- Configure supported vaccine types
-- Set capacity, hours, contacts
-- Restrict CommunityMass to one vaccine type
+note bottom of UC40
+  **US40 (ACs):**
+  - FIFO basis (First-come,
+  first-served)
+end note
+
+note bottom of UC41
+  **US41 (ACs):**
+  - Select vaccine and lot number
+  - Assigns to Recovery Room
 end note
 
 @enduml
