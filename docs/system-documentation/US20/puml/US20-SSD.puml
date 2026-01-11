@@ -1,4 +1,4 @@
-    @startuml
+@startuml
 title SSD - US20 Register SNS User
 autoactivate on
 autonumber
@@ -9,17 +9,18 @@ participant ":System" as System
 activate Rec
 
 Rec -> System: asks to register a new SNS user
-System --> Rec: requests data (name, date of birth, sex, address, phone, email, citizen card number, sns user number)
+System --> Rec: requests data (name, address, sex, phone, email, birthDate, snsNumber, ccNumber)
 
 Rec -> System: types requested data
 note right of System
-    System validates:
-    1. Mandatory fields (AC20-2)
-    2. Formats (AC20-1)
-    3. Uniqueness (AC20-3)
+    **System validates:**
+    1. Mandatory fields (all except Sex - AC20-2)
+    2. PT Formats (Phone & CC - AC20-1)
+    3. Uniqueness (Phone, Email, CC, SNS - AC20-3)
 end note
 System --> Rec: shows all data and requests confirmation
 
 Rec -> System: confirms the data
 System --> Rec: informs operation success
+deactivate Rec
 @enduml

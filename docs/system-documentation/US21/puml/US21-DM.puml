@@ -1,0 +1,41 @@
+@startuml
+title US21 - Domain Model
+
+hide methods
+hide circles
+skinparam classAttributeIconSize 0
+
+class Receptionist {
+    - name
+}
+
+class VaccineSchedule {
+    - snsNumber
+    - date
+    - time
+}
+
+class SNSUser {
+    - name
+    - snsNumber
+    - birthDate
+}
+
+class VaccineType {
+    - code
+    - description
+}
+
+class VaccinationCenter {
+    - name
+    - location
+}
+
+Receptionist "1" -right-- "0..*" VaccineSchedule: schedules >
+Receptionist "1" -down-- "0..*" SNSUser: manages >
+
+VaccineSchedule "*" -right-- "1" SNSUser: for >
+VaccineSchedule "*" -down-- "1" VaccineType: of >
+VaccineSchedule "*" -down-- "1" VaccinationCenter: at >
+
+@enduml

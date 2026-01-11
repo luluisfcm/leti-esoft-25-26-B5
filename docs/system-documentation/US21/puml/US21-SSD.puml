@@ -1,0 +1,25 @@
+@startuml
+title US21 - Schedule Vaccine Administration (SSD)
+'https://plantuml.com/sequence-diagram
+autoactivate on
+autonumber
+
+actor "Receptionist" as User
+participant "System" as System
+
+activate User
+
+User -> System: asks to schedule a new vaccine administration
+System --> User: requests data (snsNumber, date, time, center)
+
+User -> System: types requested data
+System --> User: shows existing vaccine types and ask to select one
+
+User -> System: select the intended vaccine type
+System --> User: shows all data and requests confirmation
+
+User -> System: confirms the data
+System --> User: informs operation success
+
+deactivate User
+@enduml

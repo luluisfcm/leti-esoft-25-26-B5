@@ -20,4 +20,10 @@
 | **Vaccine Type** | Tipo de vacina | [cite_start]Core classification of a vaccine (e.g., Covid-19, Influenza), defined by code, disease, and a short description.[cite: 63][cite_end] |
 | **Vaccination Certificate** | Certificado de vacinação | [cite_start]Official document proving a vaccination event; can be issued on-site at healthcare centers upon user request.[cite: 29, 32][cite_end] |
 | **Vaccination Event** | Evento de vacinação | [cite_start]The record that captures the administration of a vaccine, including date/time, vaccine type, brand, and lot number, and may reference adverse reactions.[cite: 58, 61][cite_end] |
-
+| **SNS Number** | Número de Utente do SNS | A unique 9-digit identification number required to register an SNS user in the system and to validate their identity during appointment scheduling.[cite_end] |
+| **Vaccine Schedule** | Agendamento de Vacina | The domain entity created when a receptionist or user successfully registers a vaccination slot, linking an SNS User to a specific date, time, center, and vaccine type.[cite_end] |
+| **Slot Availability** | Disponibilidade de vaga | The real-time status of a vaccination center's capacity, calculated by comparing existing schedules against the maximum vaccines per hour limit.[cite_end] |
+| **SNS User Registration** | Registo de utente do SNS | The process of adding a new citizen to the system (US20), involving the collection of personal data such as name, address, sex, contact details, and the unique SNS number.[cite_end] |
+| **Schedule Confirmation** | Confirmação de agendamento | The final step of the scheduling process where the receptionist validates the summary of entered data and persists the record in the system.[cite_end] |
+| **Waiting Room** | Sala de espera | A virtual or physical area where an SNS user is assigned by the receptionist upon arrival, prior to vaccine administration by a nurse.[cite_end] |
+| **Recovery Room** | Sala de recuperação | The area where the SNS user is assigned after vaccine administration to be monitored for any immediate adverse reactions.[cite_end] |

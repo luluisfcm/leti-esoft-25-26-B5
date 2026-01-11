@@ -1,32 +1,24 @@
 @startuml
-title US20 - Domain Model
-hide methods
-hide circles
+'https://plantuml.com/class-diagram
 skinparam classAttributeIconSize 0
-
-class DGSAdministrator {
-    - name
-    - email
-}
+hide circle
+hide methods
 
 class Receptionist {
-    - employeeID
+    - name
 }
 
 class SNSUser {
     - name
-    -dateOfBirth
-    -sex
-    -postalAddress
-    -phoneNumber
-    -email
-    -citizenCardNumber
-    -snsUserNumber
+    - address
+    - sex
+    - phoneNumber
+    - email
+    - birthDate
+    - snsNumber
+    - citizenCardNumber
 }
 
-' Relations based on your structure
-DGSAdministrator "1" -- "*" SNSUser : manages >
-DGSAdministrator "1" -- "*" Receptionist : manages >
-Receptionist "1" -- "*" SNSUser : registers >
+Receptionist "1" -right-- "0..*" SNSUser:  registers >
 
 @enduml

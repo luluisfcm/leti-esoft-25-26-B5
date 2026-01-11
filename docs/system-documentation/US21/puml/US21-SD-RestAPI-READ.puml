@@ -1,0 +1,43 @@
+@startuml
+autoactivate on
+autonumber
+
+participant "Receptionist" as Actor
+participant ":HTTPClient" as Client
+participant ":HTTPServer" as Server
+participant "handler:RouteHandler" as System
+participant ":ApiController" as Ctrl
+participant ":Receptionist" as Role
+participant "service:VaccineScheduleService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:VaccineScheduleRepository" as Repo
+participant "result:HttpResult" as Result
+
+activate Actor
+
+Actor -> Client: requests to view schedules
+Client -> Server: GET /vaccine-schedules
+Server -> System: run(req, resp)
+System -> Ctrl: getVaccineSchedules()
+
+' Obtendo o serviço através do objeto de domínio Receptionist (Consistência com US21-CREATE/UPDATE)
+Ctrl -> Role: getVaccineScheduleService()
+Role -> Factory: getVaccineScheduleRepository()
+Factory --> Role: repo
+Role --> Service**: create(repo)
+Role --> Ctrl: service
+
+' Lógica de leitura
+Ctrl -> Service: findAll()
+Service -> Repo: getAll()
+Repo --> Service: list<VaccineSchedule>
+Service --> Ctrl: list<VaccineSchedule>
+
+' Resposta HTTP
+Ctrl -> Result**: create(200, list)
+Ctrl --> System: result
+System -> System: setHttpResult(resp, result)
+System --> Server: resp
+Server --> Client: resp
+Client --> Actor: displays schedules
+@enduml

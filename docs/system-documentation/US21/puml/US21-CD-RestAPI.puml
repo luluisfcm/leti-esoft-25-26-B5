@@ -1,0 +1,25 @@
+@startuml
+left to right direction
+hide circle
+skinparam classAttributeIconSize 0
+
+class VaccineScheduleController {
+    +getVaccineSchedules(): HttpResult
+    +postVaccineSchedule(json_data): HttpResult
+    +putVaccineSchedule(id, json_data): HttpResult
+    +deleteVaccineSchedule(id): HttpResult
+}
+
+class HttpResult {
+    -status: HttpStatus
+    -result: json
+    HttpResult();
+    HttpResult(HttpStatus status);
+    HttpResult(HttpStatus status, const wstring &message);
+    HttpResult(HttpStatus status, const string &message);
+    HttpResult(HttpStatus status, const char *message);
+    HttpResult(HttpStatus status, const json &result);
+}
+
+VaccineScheduleController ..> HttpResult
+@enduml

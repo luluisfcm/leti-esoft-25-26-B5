@@ -1,0 +1,36 @@
+@startuml
+autoactivate on
+autonumber
+
+participant "Receptionist" as Actor
+participant ":HTTPClient" as Client
+participant ":HTTPServer" as Server
+participant "handler:RouteHandler" as System
+participant ":ApiController" as Ctrl
+participant ":Receptionist" as Role
+participant "service:VaccineScheduleService" as Service
+participant "repo:VaccineScheduleRepository" as Repo
+participant "result:HttpResult" as Result
+
+activate Actor
+
+Actor -> Client: asks to cancel/delete a schedule
+Client -> Server: DELETE /vaccine-schedules/{id}
+Server -> System: run(req, resp)
+System -> Ctrl: deleteVaccineSchedule(id)
+
+Ctrl -> Role: getVaccineScheduleService()
+Role --> Service**: create(repo)
+Role --> Ctrl: service
+
+Ctrl -> Service: remove(id)
+Service -> Repo: delete(id)
+Repo --> Service: ok
+Service --> Ctrl: ok
+
+Ctrl -> Result**: create(204)
+note right: No Content (Sucesso sem corpo)
+Ctrl --> System: result
+System --> Client: resp
+Client --> Actor: informs operation success
+@enduml

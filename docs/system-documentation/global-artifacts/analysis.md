@@ -12,7 +12,7 @@ To identify domain conceptual classes, we started by making a list of candidate 
 
 * `Appointment` – represents the business transaction of scheduling a vaccination for a SNS user at a specific date, time and center.
 * `VaccinationEvent` – represents the actual transaction of administering a vaccine dose to a SNS user.
-
+* `VaccinationEvent`- Explicitly state that this transaction links the Lot Number and Dose Number (e.g., 1st dose, 2nd dose) to the SNSUser
 ---
 
 **Transaction Line Items**
@@ -51,7 +51,7 @@ To identify domain conceptual classes, we started by making a list of candidate 
 * `VaccinationCenter` – abstract place where vaccination occurs.
 * `HealthcareCenter` – vaccination center located in a regular healthcare facility.
 * `CommunityMassVaccinationCenter` – vaccination center used for large-scale mass vaccination campaigns.
-
+* `WaitingRoom` – represents the waiting room or queue area of a vaccination center where SNS users wait after check-in.
 ---
 
 **Noteworthy Events**
@@ -60,7 +60,7 @@ To identify domain conceptual classes, we started by making a list of candidate 
 * `Appointment` – event where a SNS user is scheduled for vaccination.
 * `VaccinationEvent` – event where a vaccine is actually administered.
 * `AdverseReaction` – clinically relevant reaction observed after a vaccination event.
-
+* `CheckIn` – represents the event/state of the SNS user's arrival at the vaccination center.
 ---
 
 **Physical Objects**
@@ -75,7 +75,7 @@ To identify domain conceptual classes, we started by making a list of candidate 
 * `VaccineType` – describes a category of vaccines for a specific disease (e.g. disease name, short description).
 * `Outbreak` – describes the current outbreak scenario (name, start date, current flag) that influences defaults.
 * `AppointmentStatus` (enum) – describes the possible states of an appointment (Scheduled, Arrived, Ready, etc.).
-
+* `VaccineAdministrationStrategy` - This represents the business rules (metadata) for a vaccine, such as the required dosage (e.g., 0.5ml), the age group allowed, and the interval between doses. This is crucial for US20 to validate if the administration is clinically appropriate.
 ---
 
 **Catalogs**
@@ -143,22 +143,33 @@ An association is a relationship between instances of objects that indicates a r
 
 Based on these heuristics and on the global Domain Model, the main associations are:
 
-| Concept (A)              | Association                        | Concept (B)                  |
-|--------------------------|:----------------------------------:|------------------------------|
-| `SNSUser`                | schedules                          | `Appointment`                |
-| `Appointment`            | at                                 | `VaccinationCenter`         |
-| `Appointment`            | is for                             | `VaccineType`               |
-| `Appointment`            | results in                         | `VaccinationEvent`          |
-| `VaccinationEvent`       | records brand/lot of               | `Vaccine`                   |
-| `VaccinationEvent`       | captures                           | `AdverseReaction`           |
-| `SNSUser`                | obtains                            | `VaccinationCertificate`    |
-| `VaccinationEvent`       | documents                          | `VaccinationCertificate`    |
-| `Nurse`                  | administers                        | `VaccinationEvent`          |
-| `Nurse`                  | issues on-site                     | `VaccinationCertificate`    |
-| `StaffMember`            | works at                           | `VaccinationCenter`         |
-| `VaccinationCenter`      | supports                           | `VaccineType`               |
-| `VaccineType`            | has brands of                      | `Vaccine`                   |
-| `Outbreak`               | defaultFor                         | `VaccineType`               |
+| Concept (A)         |     Association      | Concept (B)              |
+|---------------------|:--------------------:|--------------------------|
+| `SNSUser`           |      schedules       | `Appointment`            |
+| `Appointment`       |          at          | `VaccinationCenter`      |
+| `Appointment`       |        is for        | `VaccineType`            |
+| `Appointment`       |      results in      | `VaccinationEvent`       |
+| `VaccinationEvent`  | records brand/lot of | `Vaccine`                |
+| `VaccinationEvent`  |       captures       | `AdverseReaction`        |
+| `SNSUser`           |       obtains        | `VaccinationCertificate` |
+| `VaccinationEvent`  |      documents       | `VaccinationCertificate` |
+| `Nurse`             |     administers      | `VaccinationEvent`       |
+| `Nurse`             |    issues on-site    | `VaccinationCertificate` |
+| `StaffMember`       |       works at       | `VaccinationCenter`      |
+| `VaccinationCenter` |       supports       | `VaccineType`            |
+| `VaccineType`       |    has brands of     | `Vaccine`                |
+| `Outbreak`          |      defaultFor      | `VaccineType`            |
+| `vaccinationCenter` |         has          | `WaitingRoom`            |
+| `Appointment`       |      generates       | `CheckIn`                |
+| `CheckIn`           |      assigns to      | `WaintingRoom`           |
+| `Nurse`             |       confirms       | `Checkin`                |
+| `Vaccine`         |   follows rules of   | `AdministrationProcess`  |
+| `VaccinationEvent`         |      completes       | `Appointment`            |
+| `Receptionist`         |      schedules       | `VaccineSchedule`        |
+| `Receptionist`         |  acts on behalf of   | `SNSUser`            |
+
+
+
 
 Each of these associations comes directly from requirements phrased in terms of “who schedules what”, “where an appointment takes place”, “which vaccine type a center supports”, “what a vaccination event records”, and “who issues certificates”, which are captured by the verbs used above.
 
@@ -218,6 +229,23 @@ Below is a summary of the main concepts and their attributes, as defined in the 
 - **Outbreak**  
   Attributes: `name`, `startDate`, `current`  
   Represents a disease outbreak; used to configure the default `VaccineType` that should be used while the outbreak is current.
+
+- **WaitingRoom**  
+  Attributes: `name`  
+  Represents the waiting room (or queue area) of a vaccination center where SNS users wait after check-in.
+
+- **CheckIn**  
+  Attributes: `dateTime`  
+  Represents the event/state that records the arrival of an SNS user at the vaccination center, associated with an appointment and a waiting room.
+
+- **VaccineSchedule**  
+  Attributes: `date,Time`  
+  Represents the booking made by the Receptionist for an SNSUser.
+
+- **VaccinationEvent**  
+  Attributes: `lotNumber, administrationDateTime, doseNumber`  
+  Represents The record created by the Nurse when the vaccine is actually given, referencing a VaccineSchedule
+
 
 The associations among these concepts (as detailed in the previous table) complete the Domain Model and capture how users, staff, centers, vaccine types, vaccines, appointments, events, reactions, certificates and outbreaks relate to each other in the Pandemic Vaccination Management System (PVMS).
 

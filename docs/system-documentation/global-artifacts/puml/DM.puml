@@ -6,14 +6,14 @@ skinparam classAttributeIconSize 0
 
 ' ===================== SNS Users =====================
 class SNSUser {
-
++ snsUserNumber : String {unique}
   + name : String
-  + dateOfBirth : Date
-  + sex : String
+  + birthDate : Date
+  + sex : String [0..1]
   + postalAddress : String
-  + phone : String
-  + email : String
-  + citizenCardNumber : String
+  + phone : String {unique}
+  + email : String {unique}
+  + citizenCardNumber : String {unique}
 }
 
 ' ===================== Staff =====================
@@ -111,6 +111,21 @@ class Outbreak {
   + current : Boolean
 }
 
+class WaitingRoom {
+  + name : String
+}
+
+class CheckIn {
+  + dateTime : DateTime
+}
+
+
+class VaccineSchedule {
+    - snsNumber
+    - date
+    - time
+}
+
 ' ===================== Associations =====================
 SNSUser "1" -- "0..*" Appointment : schedules >
 Appointment "0..*" -- "1" VaccinationCenter : at >
@@ -128,4 +143,15 @@ Nurse "1" -- "0..*" VaccinationCertificate : issues on-site >
 StaffMember "0..*" -- "0..*" VaccinationCenter : works at >
 
 Outbreak "0..1" -- "1" VaccineType : defaultFor >
+
+VaccinationCenter "1" -- "1..*" WaitingRoom : has >
+Appointment "1" -- "0..1" CheckIn : generates >
+CheckIn "1" -- "1" WaitingRoom : assigns to >
+Receptionist "1" -right-- "0..*" VaccineSchedule: schedules >
+Receptionist "1" -down-- "0..*" SNSUser: manages >
+
+VaccineSchedule "*" -right-- "1" SNSUser: for >
+VaccineSchedule "*" -down-- "1" VaccineType: of >
+VaccineSchedule "*" -down-- "1" VaccinationCenter: at >
+
 @enduml

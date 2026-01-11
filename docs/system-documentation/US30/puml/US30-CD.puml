@@ -8,43 +8,90 @@ class ScheduleVaccineView {
 }
 
 class ScheduleVaccineController {
-    +createVaccineAppointment(request: ScheduleVaccineRequest): void
-    +saveCreatedVaccineAppointment(): Result
+    +getInitialData(): Result
+    +buildPreview(request: ScheduleVaccineRequest): Result
+    +schedule(request: ScheduleVaccineRequest): Result
 }
 
 class SNSUser {
-    -snsNumber
-    -name
-    +getVaccineAppointmentContainer(): VaccineAppointmentContainer
+    - name
+    +getRepositoryFactory(): RepositoryFactory
 }
 
-class VaccineAppointmentContainer {
-    +create(request: ScheduleVaccineRequest): VaccineAppointment
-    +save(VaccineAppointment obj): Result
+class AppointmentService {
+    +AppointmentService(repoFactory: RepositoryFactory)
+    +getVaccineTypes(): List<VaccineType>
+    +getCentersFor(type: VaccineType): List<VaccinationCenter>
+    +getAvailableTimes(center: VaccinationCenter, type: VaccineType): List<Time>
+    +buildPreview(request: ScheduleVaccineRequest): SchedulePreviewDTO
+    +schedule(request: ScheduleVaccineRequest): Result
 }
 
-class VaccineAppointment {
-    -appointmentId
-    -dateTime
-    -status
-    VaccineAppointment(dateTime, status)
+interface RepositoryFactory <<interface>> {
+    +getAppointmentRepository(): AppointmentRepository
+    +getVaccineTypeRepository(): VaccineTypeRepository
+    +getVaccinationCenterRepository(): VaccinationCenterRepository
+}
+
+interface AppointmentRepository <<interface>> {
+    +findFutureAppointmentsByUserAndType(userId, type): List<Appointment>
+    +isSlotAvailable(center, date, time): boolean
+    +save(app: Appointment): Result
+}
+
+interface VaccineTypeRepository <<interface>> {
+    +getAll(): List<VaccineType>
+    +getById(id): VaccineType
+}
+
+interface VaccinationCenterRepository <<interface>> {
+    +getAll(): List<VaccinationCenter>
+    +getById(id): VaccinationCenter
+}
+
+class Appointment {
+    - date
+    - time
+    - status
+    +changeStatus(...): Result
+}
+
+class VaccineType {
+    - disease
+    - shortDescription
+}
+
+class VaccinationCenter {
+    - name
+    - postalAddress
 }
 
 class ScheduleVaccineRequest {
-    -snsUserId
-    -vaccineTypeId
-    -centerId
-    -dateTime
-    -contactInfo
+    - snsUserId
+    - vaccineTypeId
+    - centerId
+    - date
+    - time
+    - contactInfo
 }
 
-SNSUser "1" -right-> "1" VaccineAppointmentContainer: maintains
-VaccineAppointmentContainer "1" -right-> "0..*" VaccineAppointment: records
+class SchedulePreviewDTO {
+}
+
+SNSUser "1" -down-> "1" RepositoryFactory: uses
+AppointmentRepository "1" -right-> "0..*" Appointment: records
 
 ScheduleVaccineView ..> ScheduleVaccineController
 ScheduleVaccineController ..> SNSUser
-ScheduleVaccineController ..> VaccineAppointmentContainer
-ScheduleVaccineController ..> VaccineAppointment
-ScheduleVaccineController ..> ScheduleVaccineRequest
+ScheduleVaccineController ..> AppointmentService
+ScheduleVaccineController ..> Appointment
+
+AppointmentService ..> RepositoryFactory
+RepositoryFactory .right.> AppointmentRepository
+RepositoryFactory .right.> VaccineTypeRepository
+RepositoryFactory .right.> VaccinationCenterRepository
+
+AppointmentService ..> ScheduleVaccineRequest
+AppointmentService ..> SchedulePreviewDTO
 
 @enduml
