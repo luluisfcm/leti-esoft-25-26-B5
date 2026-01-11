@@ -1,5 +1,5 @@
 @startuml
-title US21 - Domain Model (Adapted to US05 Template)
+title US21 - Domain Model
 
 hide methods
 hide circles

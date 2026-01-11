@@ -1,0 +1,57 @@
+@startuml
+autoactivate on
+autonumber
+
+participant "Receptionist" as Actor
+participant ":HTTPClient" as Client
+participant ":HTTPServer" as Server
+participant "req:HTTPRequest" as Request
+participant "resp:HTTPResponse" as Response
+participant "handler:RouteHandler" as System
+participant ":ApiController" as Ctrl
+participant ":Receptionist" as Role
+participant "service:VaccineScheduleService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:VaccineScheduleRepository" as Repo
+participant "schedule:VaccineSchedule" as Entity
+participant "result:HttpResult" as Result
+
+activate Actor
+
+Actor -> Client: asks to schedule a vaccination
+Client -> Server: POST /vaccine-schedules ({json_data})
+Server -> Request**: create(..., {json_data})
+Server -> Response**: create(404)
+Server -> Server: findHandler(req)
+Server -> System: run(req, resp)
+
+System -> Ctrl**: create(...)
+System -> Ctrl: postVaccineSchedule(json_data)
+
+' Obtendo dependências através do Recepcionista e Factory
+Ctrl -> Role: getVaccineScheduleService()
+Role -> Factory: getVaccineScheduleRepository()
+Factory --> Role: repo
+Role --> Service**: create(repo)
+Role --> Ctrl: service
+
+' Processamento do Agendamento
+Ctrl -> Service: create(data)
+Service -> Entity**: create(data)
+Service --> Ctrl: schedule
+
+Ctrl -> Service: addOrUpdate(schedule)
+Service -> Service: validate(schedule)
+note right: Valida capacidade do centro (maxPerHour)
+Service --> Service: ok
+Service -> Repo: save(schedule)
+Repo --> Service: ok
+Service --> Ctrl: ok
+
+Ctrl -> Result**: create(201)
+Ctrl --> System: result
+System -> System: setHttpResult(resp, result)
+System --> Server: resp
+Server --> Client: resp
+Client --> Actor: informs operation success
+@enduml
