@@ -1,0 +1,69 @@
+@startuml
+autoactivate on
+autonumber
+title REST API – US22 – CREATE
+
+participant ":HTTPClient" as HTTPClient
+participant "handler:RouteHandler" as System
+participant ":RegisterArrivalController" as Ctrl
+participant ":Receptionist" as Receptionist
+participant "service:ArrivalService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:AppointmentRepository" as AppRepo
+participant "repo:CheckInRepository" as CheckRepo
+participant "repo:WaitingRoomRepository" as WRRepo
+participant "result:HttpResult" as Result
+
+activate HTTPClient
+
+HTTPClient -> System: POST /check-ins\nAuthorization + JSON(snsUserNumber, vaccinationCenterId)
+System -> System: validateAuth()
+System -> System: parseBody()
+
+System -> Ctrl: registerArrival(snsUserNumber, vaccinationCenterId)
+
+Ctrl -> Receptionist: getArrivalService()
+Receptionist -> Factory: getAppointmentRepository()
+Factory --> Receptionist: appRepo
+Receptionist -> Factory: getCheckInRepository()
+Factory --> Receptionist: checkRepo
+Receptionist -> Factory: getWaitingRoomRepository()
+Factory --> Receptionist: wrRepo
+Receptionist --> Service**: create(appRepo, checkRepo, wrRepo)
+Receptionist --> Ctrl: service
+
+Ctrl -> Service: registerArrival(snsUserNumber, vaccinationCenterId, today)
+
+Service -> AppRepo: findTodayAppointment(snsUserNumber, vaccinationCenterId, today)
+AppRepo --> Service: appt?
+
+alt appointment not found (AC22-3)
+  Service --> Ctrl: failure("No appointment scheduled for today")
+  Ctrl --> Result**: create(404)
+else appointment found
+  Service -> CheckRepo: existsForAppointment(appt.id)
+  CheckRepo --> Service: exists?
+
+  alt duplicate arrival (AC22-1)
+    Service --> Ctrl: failure("Arrival already registered today")
+    Ctrl --> Result**: create(409)
+  else ok
+    Service -> WRRepo: getDefaultWaitingRoom(appt.vaccinationCenterId)
+    WRRepo --> Service: wr
+
+    Service -> CheckRepo: save(new CheckIn(now, appt.id, wr))
+    CheckRepo --> Service: checkInId
+
+    Service -> AppRepo: save(appt.setStatus(Arrived), appt.setArrivalDateTime(now))
+    AppRepo --> Service: ok
+
+    Service --> Ctrl: success(checkInId, wr.name, now)
+    Ctrl --> Result**: create(201)
+  end
+end
+
+Ctrl --> System: result
+System -> System: setHttpResult(resp, result)
+System --> HTTPClient: resp
+
+@enduml

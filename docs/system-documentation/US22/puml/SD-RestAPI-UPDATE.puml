@@ -1,0 +1,59 @@
+@startuml
+autoactivate on
+autonumber
+title REST API – US22 – UPDATE (PUT /check-ins/{checkInId})
+
+participant ":HTTPClient" as HTTPClient
+participant "handler:RouteHandler" as System
+participant ":CheckInController" as Ctrl
+participant ":Receptionist" as Receptionist
+participant "service:CheckInService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "repo:CheckInRepository" as CheckRepo
+participant "repo:WaitingRoomRepository" as WRRepo
+participant "result:HttpResult" as Result
+
+activate HTTPClient
+
+HTTPClient -> System: PUT /check-ins/{checkInId}\nAuthorization + JSON(newWaitingRoomId)
+System -> System: validateAuth()
+System -> System: parsePathAndBody()
+
+System -> Ctrl: updateCheckIn(checkInId, newWaitingRoomId)
+
+Ctrl -> Receptionist: getCheckInService()
+Receptionist -> Factory: getCheckInRepository()
+Factory --> Receptionist: checkRepo
+Receptionist -> Factory: getWaitingRoomRepository()
+Factory --> Receptionist: wrRepo
+Receptionist --> Service**: create(checkRepo, wrRepo)
+Receptionist --> Ctrl: service
+
+Ctrl -> Service: updateWaitingRoom(checkInId, newWaitingRoomId)
+
+Service -> CheckRepo: getById(checkInId)
+CheckRepo --> Service: checkIn?
+
+alt check-in not found
+  Service --> Ctrl: notFound()
+  Ctrl --> Result**: create(404)
+else found
+  Service -> WRRepo: getById(newWaitingRoomId)
+  WRRepo --> Service: wr?
+
+  alt waiting room not found
+    Service --> Ctrl: invalid("Waiting room does not exist")
+    Ctrl --> Result**: create(400)
+  else ok
+    Service -> CheckRepo: save(checkIn.changeWaitingRoom(wr))
+    CheckRepo --> Service: ok
+    Service --> Ctrl: ok()
+    Ctrl --> Result**: create(200)
+  end
+end
+
+Ctrl --> System: result
+System -> System: setHttpResult(resp, result)
+System --> HTTPClient: resp
+
+@enduml
