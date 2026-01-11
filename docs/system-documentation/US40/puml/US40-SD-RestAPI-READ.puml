@@ -1,0 +1,50 @@
+@startuml
+autonumber
+title US40-SD-RestAPI-READ
+
+participant ":HTTPClient" as Client
+participant "handler:RouteHandler" as Router
+participant "ctrl:WaitingRoomController" as Ctrl
+participant "service:CheckInService" as Service
+participant "repo:CheckInRepository" as Repo
+participant "mapper:WaitingRoomMapper" as Mapper
+
+Client -> Router : GET /waitingroom/{centerId}
+activate Router
+
+Router -> Ctrl : getWaitingRoomList(centerId)
+activate Ctrl
+
+' Domain Logic
+Ctrl -> Service : getWaitingRoomList(centerId)
+activate Service
+
+Service -> Repo : findByCenter(centerId)
+activate Repo
+Repo --> Service : list<CheckIn>
+deactivate Repo
+
+Service --> Ctrl : list<CheckIn>
+deactivate Service
+
+' Mapping to Response Format (JSON)
+Ctrl -> Mapper : toJson(list)
+activate Mapper
+
+loop for each checkIn in list
+    Mapper -> Mapper : convertToDto(checkIn)
+    note right: Extracts Name and SnsNumber from SNSUser\nand ArrivalTime from CheckIn
+end
+
+Mapper --> Ctrl : jsonObj
+deactivate Mapper
+
+' HTTP Response
+create "res:HttpResult" as Res
+Ctrl -> Res : create(200, jsonObj)
+Ctrl --> Router : res
+deactivate Ctrl
+
+Router --> Client : Response (JSON + 200 OK)
+deactivate Router
+@enduml

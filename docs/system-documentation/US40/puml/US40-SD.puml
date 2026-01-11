@@ -1,6 +1,4 @@
 @startuml
-'https://plantuml.com/sequence-diagram
-
 autoactivate on
 autonumber
 
@@ -13,8 +11,7 @@ participant ":Nurse" as Nurse
 participant "service:CheckInService" as Service
 participant "factory:RepositoryFactory" as Factory
 participant "repo:CheckInRepository" as Repo
-participant "checkIn:CheckIn" as CheckIn
-participant "user:SNSUser" as User
+participant "dto:WaitingRoomDTO" as DTO
 
 activate NurseActor
 
@@ -24,33 +21,32 @@ UI --> NurseActor: requests the selection of the vaccination center
 NurseActor -> UI: selects the requested vaccination center
 UI -> Ctrl: getWaitingRoomList(center)
 
-' Obtenção do serviço via Nurse/Factory (Seguindo o Molde)
+' Obtenção do serviço via Nurse/Factory
 Ctrl -> Nurse: getCheckInService()
 Nurse -> Factory : getCheckInRepository()
 Factory --> Nurse: repo
 Nurse --> Service**: create(repo)
 Nurse --> Ctrl: service
 
-' Obtenção da lista ordenada
+' Obtenção da lista e conversão para DTO no Serviço
 Ctrl -> Service: getWaitingRoomList(center)
-note right: AC40-1: Logic to sort by arrival time
+note right: AC40-1: Logic to sort by arrival time (FIFO)
 Service -> Repo: findByCenter(center)
-Repo --> Service: List<CheckIn>
-Service --> Ctrl: List<CheckIn>
-Ctrl --> UI: List<CheckIn>
+Repo --> Service: list<CheckIn>
 
-UI --> NurseActor: shows the waiting list and requests confirmation to view
-
-' Iteração sobre os dados após confirmação
-NurseActor -> UI: confirms the view
 loop for each checkIn in list
-    UI -> CheckIn: getSNSUser()
-    CheckIn --> UI: user
-    UI -> User: getName()
-    User --> UI: name
-    UI -> User: getSnsUserNumber()
-    User --> UI: snsNumber
-    UI --> NurseActor: displays name + snsNumber
-end loop
+    Service -> DTO**: create(name, snsNumber, arrivalTime)
+    note right: Extracts name and snsNumber from SNSUser entity
+end
+
+Service --> Ctrl: list<WaitingRoomDTO>
+deactivate Service
+
+Ctrl --> UI: list<WaitingRoomDTO>
+deactivate Ctrl
+
+' Exibição dos dados simplificados
+UI --> NurseActor: displays the waiting list (Name, SNS Number, Arrival Time)
+deactivate UI
 
 @enduml

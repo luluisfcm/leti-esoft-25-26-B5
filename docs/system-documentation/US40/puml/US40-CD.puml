@@ -1,27 +1,33 @@
 @startuml
 hide circle
-title US40 - CD
+title US40 - CD (Updated with DTO)
 skinparam classAttributeIconSize 0
 
 class ConsultWaitingRoomView {
 }
 
 class ConsultWaitingRoomController {
-    +getWaitingRoomList(center): List<CheckIn>
+    +getWaitingRoomList(centerId: string): List<WaitingRoomDTO>
+}
+
+class WaitingRoomDTO {
+    +name: string
+    +snsNumber: string
+    +arrivalTime: string
 }
 
 class Nurse {
-    - email
+    -email: string
     +getCheckInService(): CheckInService
 }
 
 class CheckInService {
-    +CheckInService(CheckInRepository checkInRepo)
-    +getWaitingRoomList(center): List<CheckIn>
+    +CheckInService(repo: CheckInRepository)
+    +getWaitingRoomList(centerId: string): List<WaitingRoomDTO>
 }
 
 interface CheckInRepository <<interface>> {
-    +findByCenter(center): List<CheckIn>
+    +findByCenter(centerId: string): List<CheckIn>
 }
 
 interface RepositoryFactory <<interface>> {
@@ -29,27 +35,29 @@ interface RepositoryFactory <<interface>> {
 }
 
 class CheckIn {
-    - dateTime
+    -arrivalDateTime: string
     +getSNSUser(): SNSUser
-    +getDateTime(): DateTime
 }
 
 class SNSUser {
-    - snsUserNumber
-    - name
+    -snsUserNumber: string
+    -name: string
 }
 
-Nurse "1" -down-> "1" RepositoryFactory: uses
-CheckInRepository "1" -right-> "0..*" CheckIn: records
-CheckIn "1" -down-> "1" SNSUser: associated to
-
+' Relationships
 ConsultWaitingRoomView ..> ConsultWaitingRoomController
-ConsultWaitingRoomView ..> CheckIn
+ConsultWaitingRoomView ..> WaitingRoomDTO
+
 ConsultWaitingRoomController ..> Nurse
 ConsultWaitingRoomController ..> CheckInService
+ConsultWaitingRoomController ..> WaitingRoomDTO
+
 CheckInService ..> CheckInRepository
+CheckInService ..> WaitingRoomDTO
+CheckInService ..> CheckIn
 
-Nurse -> CheckInService: adopts
-RepositoryFactory .right.> CheckInRepository
+Nurse ..> RepositoryFactory
+RepositoryFactory ..> CheckInRepository
 
+CheckIn "1" -> "1" SNSUser : associated to
 @enduml
