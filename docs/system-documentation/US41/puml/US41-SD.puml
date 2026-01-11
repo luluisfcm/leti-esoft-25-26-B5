@@ -1,5 +1,5 @@
 @startuml
-title SD – US41 Record Vaccination Event
+title SD – US41 Record Vaccination Event (Corrected & Refined)
 autoactivate on
 autonumber
 
@@ -12,7 +12,9 @@ participant "factory:RepositoryFactory" as Factory
 participant "vacRepo:VaccineRepository" as VacRepo
 participant "eventRepo:VaccinationEventRepository" as EventRepo
 participant "appRepo:AppointmentRepository" as AppRepo
+participant "vaccineDTO:VaccineDTO" as DTO
 participant "event:VaccinationEvent" as Event
+participant "appointment:Appointment" as App
 
 activate Nurse
 
@@ -23,27 +25,30 @@ NurseObj -> Factory: getVaccineRepository()
 Factory --> NurseObj: vacRepo
 NurseObj --> Service**: create(vacRepo, eventRepo, appRepo)
 NurseObj --> Ctrl: service
-Ctrl -> Service: getVaccines()
+
+' Resposta à pergunta do prof: Uso de DTO para não expor o domínio à UI
+Ctrl -> Service: getVaccinesDTO()
 Service -> VacRepo: findAll()
 VacRepo --> Service: vaccinesList
-Service --> Ctrl: vaccinesList
-Ctrl --> UI: vaccinesList
+Service -> Service: mapToDTO(vaccinesList)
+Service --> Ctrl: vaccinesDTOList
+Ctrl --> UI: vaccinesDTOList
 UI --> Nurse: shows vaccines and requests data (snsUserNum, lotNumber, selectedVaccine)
 
 Nurse -> UI: types requested data
+' UI envia apenas strings/dados simples, cumprindo a proteção do domínio
 UI -> Ctrl: recordVaccination(snsUserNum, lotNumber, vaccineBrand)
 Ctrl -> Service: createVaccinationEvent(snsUserNum, lotNumber, vaccineBrand)
 Service --> Event**: create(snsUserNum, lotNumber, vaccine)
-Service --> Ctrl: event
+Service --> Ctrl: ok
 Ctrl --> UI: ok
-UI --> Nurse: shows all data and requests confirmation
+UI --> Nurse: requests confirmation
 
 Nurse -> UI: confirms the data
 UI -> Ctrl: saveVaccinationEvent()
-Ctrl -> Service: saveEvent(event)
-Service -> Service: validate(event)
-Service --> Service: ok
-Service -> EventRepo: save(event)
+Ctrl -> Service: saveEvent()
+Service -> Service: validate(currentEvent)
+Service -> EventRepo: save(currentEvent)
 EventRepo --> Service: ok
 
 == AC41-2: Assign to Recovery Room ==
@@ -51,7 +56,11 @@ EventRepo --> Service: ok
 Service -> Service: assignToRecoveryRoom(snsUserNum)
 Service -> AppRepo: findActiveBySNSUser(snsUserNum)
 AppRepo --> Service: appointment
-Service -> Service: updateStatus(appointment, "InRecovery")
+
+' CORREÇÃO DO PONTO 31: Mensagem direta para a entidade Appointment
+Service -> App: setStatus(InRecovery)
+App --> Service: ok (status updated)
+
 Service -> AppRepo: save(appointment)
 AppRepo --> Service: ok
 Service --> Service: ok
@@ -59,4 +68,5 @@ Service --> Service: ok
 Service --> Ctrl: ok
 Ctrl --> UI: ok
 UI --> Nurse: informs operation success
+
 @enduml

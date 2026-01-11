@@ -1,5 +1,5 @@
 @startuml
-title CD – US41 Record Vaccine Administration
+title CD – US41 Record Vaccine Administration (Updated with DTO)
 
 hide circle
 skinparam classAttributeIconSize 0
@@ -9,7 +9,7 @@ class RecordVaccinationView {
 }
 
 class RecordVaccinationController {
-    + getVaccinesList(): List<Vaccine>
+    + getVaccinesList(): List<VaccineDTO>
     + recordVaccination(snsUserNum, lotNumber, vaccineBrand): void
     + saveVaccinationEvent(): Result
 }
@@ -21,11 +21,18 @@ class Nurse {
 }
 
 class VaccinationService {
-    + VaccinationService(VaccinationEventRepository eventRepo, AppointmentRepository appRepo, VaccineRepository vacRepo)
-    + getVaccines(): List<Vaccine>
-    + createVaccinationEvent(snsUserNum, lotNumber, vaccineBrand): VaccinationEvent
-    + assignToRecoveryRoom(snsUserNum): Result
-    + saveEvent(VaccinationEvent event): Result
+    + VaccinationService(eventRepo, appRepo, vacRepo)
+    + getVaccinesDTO(): List<VaccineDTO>
+    + createVaccinationEvent(snsUserNum, lotNumber, vaccineBrand): void
+    + saveEvent(): Result
+    + assignToRecoveryRoom(snsUserNum): void
+}
+
+' ===================== DTO =====================
+class VaccineDTO {
+    - brand : String
+    - commercialName : String
+    + VaccineDTO(brand, name)
 }
 
 ' ===================== Interfaces (Persistence) =====================
@@ -48,48 +55,40 @@ interface RepositoryFactory <<interface>> {
     + getVaccineRepository(): VaccineRepository
 }
 
-' ===================== Implementations (Persistence) =====================
-class VaccinationEventMemoryRepository {
-    + save(VaccinationEvent event): Result
-}
-
-class MemoryRepositoryFactory {
-    + getVaccinationEventRepository(): VaccinationEventRepository
-    + getAppointmentRepository(): AppointmentRepository
-    + getVaccineRepository(): VaccineRepository
-}
-
 ' ===================== Entities =====================
 class VaccinationEvent {
-    - lotNumber
-    - administrationDateTime
-    + VaccinationEvent(snsUserNum, lotNumber, vaccine)
+    - lotNumber : String
+    - administrationDateTime : DateTime
+    + VaccinationEvent(snsUser, lot, vaccine)
 }
 
 class Appointment {
-    - status
+    - status : AppointmentStatus
+    - arrivalDateTime : DateTime
     + setStatus(status): void
 }
 
 class Vaccine {
-    - commercialName
-    - brand
+    - commercialName : String
+    - brand : String
+    - technologyUsed : String
 }
 
 ' ===================== Relationships =====================
-' UI and Logic
+' UI and Logic layer
 RecordVaccinationView ..> RecordVaccinationController
 RecordVaccinationController ..> Nurse
 RecordVaccinationController ..> VaccinationService
+RecordVaccinationController ..> VaccineDTO
 Nurse -> VaccinationService: adopts
-RecordVaccinationController ..> VaccinationEvent
 
-' Service and Domain
+' Service and Domain layer
 VaccinationService ..> VaccinationEventRepository
 VaccinationService ..> AppointmentRepository
 VaccinationService ..> VaccineRepository
 VaccinationService ..> VaccinationEvent
 VaccinationService ..> Appointment
+VaccinationService ..> VaccineDTO
 
 ' Factory and Repositories
 Nurse "1" -down-> "1" RepositoryFactory: uses
@@ -98,9 +97,7 @@ RepositoryFactory ..> VaccinationEventRepository
 RepositoryFactory ..> AppointmentRepository
 RepositoryFactory ..> VaccineRepository
 
-' Implementations (Based on v2 example)
-VaccinationEventMemoryRepository .up.|> VaccinationEventRepository
-MemoryRepositoryFactory .up.|> RepositoryFactory
-MemoryRepositoryFactory .right.> VaccinationEventMemoryRepository
-
+' Entity relationship from DM
+Appointment "1" -right-> "0..1" VaccinationEvent : results in
+VaccinationEvent "0..*" --> "1" Vaccine : of
 @enduml

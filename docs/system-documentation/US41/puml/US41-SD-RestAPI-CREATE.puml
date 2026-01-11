@@ -1,0 +1,62 @@
+@startuml
+title SD-RestAPI-CREATE – US41 Record Vaccination Event
+autoactivate on
+autonumber
+
+participant "Nurse" as Actor
+participant ":HTTPClient" as Client
+participant ":HTTPServer" as Server
+participant "req:HTTPRequest" as Request
+participant "resp:HTTPResponse" as Response
+participant "handler:RouteHandler" as System
+participant ":VaccineAdministrationController" as Ctrl
+participant ":Nurse" as Role
+participant "service:VaccinationService" as Service
+participant "factory:RepositoryFactory" as Factory
+participant "eventRepo:VaccinationEventRepository" as EventRepo
+participant "appRepo:AppointmentRepository" as AppRepo
+participant "event:VaccinationEvent" as Entity
+participant "result:HttpResult" as Result
+
+activate Actor
+
+Actor -> Client: provides vaccination data (snsUser, vaccine, lot)
+Client -> Server: POST /api/vaccinations ({json_data})
+Server -> Request**: create(..., {json_data})
+Server -> Response**: create(404)
+Server -> Server: findHandler(req)
+Server -> System: run(req, resp)
+
+System -> Ctrl**: create(...)
+System -> Ctrl: postVaccineAdministration(json_data)
+
+' Obtendo dependências através do objeto de domínio Nurse e Factory [cite: 18, 23]
+Ctrl -> Role: getVaccinationService()
+Role -> Factory: getVaccinationEventRepository()
+Factory --> Role: eventRepo
+Role -> Factory: getAppointmentRepository()
+Factory --> Role: appRepo
+Role --> Service**: create(eventRepo, appRepo)
+Role --> Ctrl: service
+
+' Processamento do Registo e Mudança de Estado
+Ctrl -> Service: recordAdministration(data)
+Service -> Entity**: create(data)
+Service -> AppRepo: findActiveBySNSUser(snsUserNum)
+AppRepo --> Service: appointment
+Service -> "appointment:Appointment": setStatus(InRecovery)
+"appointment:Appointment" --> Service: ok
+Service -> EventRepo: save(event)
+EventRepo --> Service: ok
+Service -> AppRepo: save(appointment)
+AppRepo --> Service: ok
+Service --> Ctrl: ok
+
+' Resposta HTTP [cite: 18]
+Ctrl -> Result**: create(201, "Vaccination recorded and user assigned to recovery")
+Ctrl --> System: result
+System -> System: setHttpResult(resp, result)
+System --> Server: resp
+Server --> Client: resp
+Client --> Actor: informs success
+@enduml
