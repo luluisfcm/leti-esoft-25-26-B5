@@ -1,0 +1,81 @@
+@startuml
+title CD – US41 RestAPI Vaccine Administration
+
+hide circle
+skinparam classAttributeIconSize 0
+
+' ===================== RestAPI Layer =====================
+class VaccineAdministrationController {
+    + getAvailableVaccines(): HttpResult
+    + postVaccineAdministration(json_data): HttpResult
+}
+
+class HttpResult {
+    - status: HttpStatus
+    - result: json
+    + HttpResult(status: HttpStatus)
+    + HttpResult(status: HttpStatus, result: json)
+}
+
+enum HttpStatus {
+    OK
+    CREATED
+    BAD_REQUEST
+    NOT_FOUND
+}
+
+' ===================== Domain / Service Layer =====================
+class Nurse {
+    - name : String
+    + getVaccinationService(): VaccinationService
+}
+
+class VaccinationService {
+    + VaccinationService(eventRepo, appRepo, vacRepo)
+    + getVaccinesDTO(): List<VaccineDTO>
+    + recordAdministration(data): void
+}
+
+class VaccineDTO {
+    - brand : String
+    - commercialName : String
+}
+
+' ===================== Repositories & Entities =====================
+interface RepositoryFactory <<interface>> {
+    + getVaccinationEventRepository(): VaccinationEventRepository
+    + getAppointmentRepository(): AppointmentRepository
+    + getVaccineRepository(): VaccineRepository
+}
+
+class VaccinationEvent {
+    - lotNumber : String
+    - administrationDateTime : DateTime
+}
+
+class Appointment {
+    - status : AppointmentStatus
+    + setStatus(status): void
+}
+
+' ===================== Relationships =====================
+' RestAPI mapping
+VaccineAdministrationController ..> HttpResult
+HttpResult -> HttpStatus
+
+' Controller to Domain
+VaccineAdministrationController ..> Nurse
+VaccineAdministrationController ..> VaccinationService
+VaccineAdministrationController ..> VaccineDTO
+
+' Service logic [cite: 20, 24]
+Nurse -> VaccinationService : adopts
+VaccinationService ..> RepositoryFactory
+VaccinationService ..> VaccineDTO
+VaccinationService ..> VaccinationEvent
+VaccinationService ..> Appointment
+
+' Domain relationships [cite: 22]
+Appointment "1" -right-> "0..1" VaccinationEvent : results in
+VaccinationEvent "0..*" --> "1" Vaccine : of
+@enduml
